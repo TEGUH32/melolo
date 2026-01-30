@@ -4,87 +4,1528 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
-    
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Video.js CSS -->
-    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
-    
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/style.css">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
-    
-    <!-- Meta Tags -->
-    <meta name="description" content="Streaming drama China terlengkap dengan subtitle Bahasa Indonesia. Nikmati berbagai drama trending dan terbaru dengan kualitas terbaik.">
-    <meta name="keywords" content="drama china, streaming drama, chinese drama, film china, subtitle indonesia">
-    <meta name="author" content="DramaChina">
-    <meta property="og:title" content="<%= title %>">
-    <meta property="og:description" content="Streaming drama China terlengkap dengan subtitle Bahasa Indonesia">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://dramachina.com">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1574269909862-7e1d70bb8078">
-    
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet">
     <style>
-        /* Additional styles for better UI */
-        .notification {
+        /* ===== ROOT VARIABLES & RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-color: #e50914;
+            --secondary-color: #b81d24;
+            --dark-bg: #141414;
+            --light-bg: #1f1f1f;
+            --text-color: #ffffff;
+            --text-secondary: #b3b3b3;
+            --card-bg: #2d2d2d;
+            --trending-color: #ff6b00;
+            --search-color: #00a8ff;
+            --success-color: #4CAF50;
+            --warning-color: #ff9800;
+            --error-color: #f44336;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER STYLES ===== */
+        header {
+            background-color: rgba(0, 0, 0, 0.95);
+            padding: 20px 5%;
             position: fixed;
-            top: 80px;
-            right: 20px;
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        header.scrolled {
+            padding: 15px 5%;
+            background-color: rgba(0, 0, 0, 0.98);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo h1 {
+            color: var(--primary-color);
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--primary-color), #ff6b00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo i {
+            color: var(--primary-color);
+            font-size: 32px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 18px;
+            transition: color 0.3s;
+            position: relative;
+            padding: 5px 0;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: width 0.3s;
+        }
+
+        nav a:hover::after,
+        nav a.active::after {
+            width: 100%;
+        }
+
+        nav a:hover {
+            color: var(--primary-color);
+        }
+
+        /* ===== SEARCH CONTAINER ===== */
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+
+        .search-container input {
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            width: 250px;
+            transition: all 0.3s;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-color: var(--search-color);
+            box-shadow: 0 0 0 2px rgba(0, 168, 255, 0.3);
+            width: 300px;
+        }
+
+        .search-container button {
+            background-color: var(--search-color);
             color: white;
-            padding: 15px 25px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            z-index: 9999;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .search-container button:hover {
+            background-color: #0097e6;
+            transform: scale(1.05);
+        }
+
+        /* ===== SEARCH RESULTS DROPDOWN ===== */
+        .search-results {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 100%;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--light-bg);
+            border-radius: 4px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
             display: none;
-            animation: slideIn 0.3s ease;
+            z-index: 1001;
         }
-        
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+
+        .search-results.active {
+            display: block;
         }
-        
-        .player-test-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
+
+        .search-result-item {
+            padding: 15px;
+            border-bottom: 1px solid #333;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-result-item:hover {
+            background-color: var(--card-bg);
+        }
+
+        .search-result-item img {
+            width: 60px;
+            height: 85px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .search-result-info h4 {
+            color: white;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .search-result-info p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .view-all-results {
+            padding: 15px;
+            text-align: center;
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .view-all-results:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* ===== MOBILE MENU BUTTON ===== */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            padding: 150px 5% 80px;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), var(--dark-bg)), 
+                        url('https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');
+            background-size: cover;
+            background-position: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(229, 9, 20, 0.1), rgba(255, 107, 0, 0.1));
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: white;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+            animation: fadeInDown 1s ease;
+        }
+
+        .hero p {
+            font-size: 22px;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            color: #f0f0f0;
+            animation: fadeInUp 1s ease 0.3s both;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, var(--primary-color), var(--trending-color));
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            animation: fadeIn 1s ease 0.6s both;
+            box-shadow: 0 8px 20px rgba(229, 9, 20, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(229, 9, 20, 0.4);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .container {
+            padding: 60px 5%;
+        }
+
+        .section-title {
+            font-size: 32px;
+            margin-bottom: 30px;
+            color: white;
+            border-left: 5px solid var(--primary-color);
+            padding-left: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title.trending {
+            border-left-color: var(--trending-color);
+        }
+
+        .section-title.trending i {
+            color: var(--trending-color);
+            animation: fire 2s infinite;
+        }
+
+        .section-title.search-results-title {
+            border-left-color: var(--search-color);
+        }
+
+        .section-title.search-results-title i {
+            color: var(--search-color);
+        }
+
+        /* ===== DRAMA GRID ===== */
+        .drama-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .drama-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .drama-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7);
+        }
+
+        .drama-card.trending {
+            border: 2px solid var(--trending-color);
+        }
+
+        .drama-card.search-result {
+            border: 2px solid var(--search-color);
+        }
+
+        .card-image {
+            position: relative;
+            height: 380px;
+            overflow: hidden;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s;
+        }
+
+        .drama-card:hover .card-image img {
+            transform: scale(1.1);
+        }
+
+        .age-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 14px;
+            z-index: 2;
+        }
+
+        .trending-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(45deg, var(--trending-color), #ff8c00);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 14px;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .search-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(45deg, var(--search-color), #0097e6);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 14px;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .drama-info {
+            padding: 20px;
+        }
+
+        .drama-info h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: white;
+            height: 50px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .drama-info p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 15px;
+            height: 60px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+
+        .drama-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+
+        .drama-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .watch-btn {
             background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
             color: white;
             border: none;
             padding: 12px 20px;
+            border-radius: 4px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .watch-btn:hover {
+            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(229, 9, 20, 0.3);
+        }
+
+        .watch-btn.trending {
+            background: linear-gradient(45deg, var(--trending-color), #ff8c00);
+        }
+
+        .watch-btn.trending:hover {
+            background: linear-gradient(45deg, #ff8c00, var(--trending-color));
+        }
+
+        .watch-btn.search-result {
+            background: linear-gradient(45deg, var(--search-color), #0097e6);
+        }
+
+        .watch-btn.search-result:hover {
+            background: linear-gradient(45deg, #0097e6, var(--search-color));
+        }
+
+        /* ===== LOADING STATES ===== */
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 20px;
+            grid-column: 1 / -1;
+        }
+
+        .loading i {
+            color: var(--primary-color);
+            font-size: 40px;
+            margin-bottom: 20px;
+            animation: spin 2s linear infinite;
+        }
+
+        /* ===== FILTER CONTAINER ===== */
+        .filter-container {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            border: none;
+            padding: 10px 20px;
             border-radius: 50px;
             cursor: pointer;
-            z-index: 999;
-            box-shadow: 0 5px 15px rgba(229, 9, 20, 0.3);
+            transition: all 0.3s;
             display: flex;
             align-items: center;
             gap: 8px;
-            font-weight: 600;
         }
-        
-        .player-test-btn:hover {
+
+        .filter-btn.active {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .filter-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        /* ===== SEARCH RESULTS SECTION ===== */
+        .search-results-section {
+            display: none;
+        }
+
+        .search-results-section.active {
+            display: block;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: var(--light-bg);
+            border-radius: 10px;
+            margin-bottom: 50px;
+        }
+
+        .no-results i {
+            font-size: 60px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .no-results h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .no-results p {
+            color: var(--text-secondary);
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ===== DRAMA MODAL ===== */
+        .drama-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            overflow-y: auto;
+            padding: 40px 5%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: var(--light-bg);
+            border-radius: 10px;
+            max-width: 1000px;
+            margin: 0 auto;
+            overflow: hidden;
+            animation: slideUp 0.5s ease;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            padding: 30px;
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-bg));
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .modal-header h2 {
+            font-size: 32px;
+            color: white;
+            max-width: 80%;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-modal:hover {
+            transform: rotate(90deg);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-body {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+        }
+
+        .modal-poster {
+            border-radius: 8px;
+            overflow: hidden;
+            height: 450px;
+        }
+
+        .modal-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-info h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: white;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        .modal-info p {
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .modal-details {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .modal-details ul {
+            list-style: none;
+        }
+
+        .modal-details li {
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-details li strong {
+            color: white;
+            min-width: 120px;
+            display: inline-block;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .modal-actions button {
+            padding: 15px 30px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .play-btn {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .play-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(229, 9, 20, 0.4);
+            box-shadow: 0 10px 20px rgba(229, 9, 20, 0.3);
+        }
+
+        .trailer-btn {
+            background-color: transparent;
+            color: white;
+            border: 2px solid white !important;
+        }
+
+        .trailer-btn:hover {
+            background-color: white;
+            color: var(--dark-bg);
+            transform: translateY(-3px);
+        }
+
+        /* ===== VIDEO PLAYER MODAL ===== */
+        .video-player-modal .modal-content {
+            max-width: 1000px !important;
+            background-color: #000 !important;
+        }
+
+        .video-player-modal .modal-header {
+            background: linear-gradient(135deg, #000, #333) !important;
+            padding: 15px 20px !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+        }
+
+        .video-player-modal .modal-header h2 {
+            color: white !important;
+            font-size: 20px !important;
+            margin: 0 !important;
+        }
+
+        .player-controls-top {
+            display: flex !important;
+            gap: 10px !important;
+            align-items: center !important;
+        }
+
+        .player-btn {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+            border: none !important;
+            padding: 8px 15px !important;
+            border-radius: 4px !important;
+            cursor: pointer !important;
+            transition: all 0.3s !important;
+            font-size: 14px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 5px !important;
+        }
+
+        .player-btn:hover {
+            background-color: var(--primary-color) !important;
+            transform: translateY(-2px) !important;
+        }
+
+        .video-container {
+            position: relative !important;
+            width: 100% !important;
+            background-color: #000 !important;
+            aspect-ratio: 16/9 !important;
+        }
+
+        .video-loading {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+            background-color: rgba(0, 0, 0, 0.9) !important;
+            color: white !important;
+            z-index: 10 !important;
+        }
+
+        .video-loading i {
+            font-size: 40px !important;
+            color: var(--primary-color) !important;
+            margin-bottom: 15px !important;
+        }
+
+        #mainVideoPlayer {
+            width: 100% !important;
+            height: 100% !important;
+            background-color: #000 !important;
+        }
+
+        .custom-controls {
+            position: absolute !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8)) !important;
+            padding: 20px !important;
+            z-index: 5 !important;
+            opacity: 0 !important;
+            transition: opacity 0.3s !important;
+        }
+
+        .video-container:hover .custom-controls {
+            opacity: 1 !important;
+        }
+
+        .progress-container {
+            width: 100% !important;
+            margin-bottom: 15px !important;
+        }
+
+        .progress-bar {
+            width: 100% !important;
+            height: 6px !important;
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            border-radius: 3px !important;
+            cursor: pointer !important;
+            position: relative !important;
+            margin-bottom: 5px !important;
+        }
+
+        .progress-filled {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            height: 100% !important;
+            background-color: var(--primary-color) !important;
+            border-radius: 3px !important;
+            width: 0% !important;
+        }
+
+        .progress-thumb {
+            position: absolute !important;
+            top: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            width: 16px !important;
+            height: 16px !important;
+            background-color: var(--primary-color) !important;
+            border-radius: 50% !important;
+            cursor: pointer !important;
+            left: 0% !important;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .time-display {
+            display: flex !important;
+            justify-content: space-between !important;
+            color: white !important;
+            font-size: 14px !important;
+            margin-top: 5px !important;
+        }
+
+        .control-buttons {
+            display: flex !important;
+            align-items: center !important;
+            gap: 15px !important;
+            flex-wrap: wrap !important;
+        }
+
+        .control-btn {
+            background: none !important;
+            border: none !important;
+            color: white !important;
+            font-size: 18px !important;
+            cursor: pointer !important;
+            padding: 8px !important;
+            border-radius: 4px !important;
+            transition: all 0.3s !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 5px !important;
+        }
+
+        .control-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            transform: scale(1.1) !important;
+        }
+
+        .volume-slider {
+            flex: 1 !important;
+            max-width: 100px !important;
+        }
+
+        .volume-slider input {
+            width: 100% !important;
+            height: 4px !important;
+            -webkit-appearance: none !important;
+            background: rgba(255, 255, 255, 0.2) !important;
+            border-radius: 2px !important;
+            outline: none !important;
+        }
+
+        .volume-slider input::-webkit-slider-thumb {
+            -webkit-appearance: none !important;
+            width: 14px !important;
+            height: 14px !important;
+            background: var(--primary-color) !important;
+            border-radius: 50% !important;
+            cursor: pointer !important;
+        }
+
+        .volume-slider input::-moz-range-thumb {
+            width: 14px !important;
+            height: 14px !important;
+            background: var(--primary-color) !important;
+            border-radius: 50% !important;
+            cursor: pointer !important;
+            border: none !important;
+        }
+
+        .video-info-panel {
+            padding: 20px !important;
+            background-color: var(--light-bg) !important;
+            border-top: 1px solid #333 !important;
+        }
+
+        .video-info-header h3 {
+            color: white !important;
+            margin-bottom: 10px !important;
+            font-size: 18px !important;
+        }
+
+        .video-stats {
+            display: flex !important;
+            gap: 20px !important;
+            color: var(--text-secondary) !important;
+            font-size: 14px !important;
+        }
+
+        .video-stats span {
+            display: flex !important;
+            align-items: center !important;
+            gap: 5px !important;
+        }
+
+        .video-description {
+            color: var(--text-secondary) !important;
+            font-size: 14px !important;
+            line-height: 1.6 !important;
+            margin-bottom: 20px !important;
+        }
+
+        .video-quality-info {
+            display: flex !important;
+            gap: 15px !important;
+            align-items: center !important;
+        }
+
+        .quality-badge {
+            background-color: rgba(0, 168, 255, 0.2) !important;
+            color: var(--search-color) !important;
+            padding: 5px 12px !important;
+            border-radius: 20px !important;
+            font-size: 14px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 5px !important;
+            border: 1px solid var(--search-color) !important;
+        }
+
+        .quality-badge.auto {
+            background-color: rgba(229, 9, 20, 0.2) !important;
+            color: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+        }
+
+        .quality-badge.720p {
+            background-color: rgba(255, 107, 0, 0.2) !important;
+            color: var(--trending-color) !important;
+            border-color: var(--trending-color) !important;
+        }
+
+        .resolution-info {
+            color: var(--text-secondary) !important;
+            font-size: 14px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 5px !important;
+        }
+
+        /* ===== QUALITY & SUBTITLE MODALS ===== */
+        .quality-modal, .subtitle-modal {
+            display: none !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            background-color: var(--light-bg) !important;
+            border-radius: 10px !important;
+            padding: 20px !important;
+            z-index: 100 !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+            min-width: 300px !important;
+        }
+
+        .quality-options, .subtitle-options {
+            margin-bottom: 20px !important;
+        }
+
+        .quality-option, .subtitle-option {
+            padding: 12px 15px !important;
+            background-color: var(--card-bg) !important;
+            border-radius: 8px !important;
+            margin-bottom: 10px !important;
+            cursor: pointer !important;
+            transition: all 0.3s !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            border: 2px solid transparent !important;
+        }
+
+        .quality-option:hover, .subtitle-option:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            transform: translateX(5px) !important;
+        }
+
+        .quality-option.active, .subtitle-option.active {
+            border-color: var(--primary-color) !important;
+            background-color: rgba(229, 9, 20, 0.1) !important;
+        }
+
+        .quality-desc {
+            margin-left: auto !important;
+            color: var(--text-secondary) !important;
+            font-size: 12px !important;
+        }
+
+        .quality-actions, .subtitle-actions {
+            display: flex !important;
+            gap: 10px !important;
+            justify-content: flex-end !important;
+        }
+
+        .quality-btn, .subtitle-btn {
+            padding: 8px 20px !important;
+            border-radius: 4px !important;
+            border: none !important;
+            cursor: pointer !important;
+            font-weight: 600 !important;
+            transition: all 0.3s !important;
+        }
+
+        .quality-btn:not(.cancel), .subtitle-btn:not(.cancel) {
+            background-color: var(--primary-color) !important;
+            color: white !important;
+        }
+
+        .quality-btn.cancel, .subtitle-btn.cancel {
+            background-color: transparent !important;
+            color: var(--text-secondary) !important;
+            border: 1px solid var(--text-secondary) !important;
+        }
+
+        /* ===== EPISODE NAVIGATION ===== */
+        .episode-navigation {
+            display: flex !important;
+            justify-content: space-between !important;
+            padding: 15px 20px !important;
+            background-color: var(--dark-bg) !important;
+            border-top: 1px solid #333 !important;
+        }
+
+        .episode-nav-btn {
+            background-color: var(--card-bg) !important;
+            color: white !important;
+            border: none !important;
+            padding: 10px 20px !important;
+            border-radius: 4px !important;
+            cursor: pointer !important;
+            transition: all 0.3s !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+        }
+
+        .episode-nav-btn:hover {
+            background-color: var(--primary-color) !important;
+            transform: translateY(-2px) !important;
+        }
+
+        .episode-list-toggle {
+            background-color: transparent !important;
+            color: var(--text-secondary) !important;
+            border: 1px solid var(--text-secondary) !important;
+            padding: 10px 20px !important;
+            border-radius: 4px !important;
+            cursor: pointer !important;
+            transition: all 0.3s !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+        }
+
+        .episode-list-toggle:hover {
+            color: white !important;
+            border-color: white !important;
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* ===== EPISODE SIDEBAR ===== */
+        .episode-sidebar {
+            position: fixed !important;
+            top: 0 !important;
+            right: -400px !important;
+            width: 350px !important;
+            height: 100vh !important;
+            background-color: var(--light-bg) !important;
+            z-index: 1000 !important;
+            transition: right 0.3s ease !important;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        .episode-sidebar.active {
+            right: 0 !important;
+        }
+
+        .episode-sidebar-header {
+            padding: 20px !important;
+            border-bottom: 1px solid #333 !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+        }
+
+        .close-sidebar {
+            background: none !important;
+            border: none !important;
+            color: white !important;
+            font-size: 20px !important;
+            cursor: pointer !important;
+            padding: 5px !important;
+            border-radius: 50% !important;
+            width: 30px !important;
+            height: 30px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        .episode-list {
+            height: calc(100vh - 80px) !important;
+            overflow-y: auto !important;
+            padding: 15px !important;
+        }
+
+        .episode-item {
+            display: flex !important;
+            gap: 15px !important;
+            padding: 10px !important;
+            background-color: var(--card-bg) !important;
+            border-radius: 8px !important;
+            margin-bottom: 10px !important;
+            cursor: pointer !important;
+            transition: all 0.3s !important;
+            border: 2px solid transparent !important;
+        }
+
+        .episode-item:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            transform: translateX(-5px) !important;
+        }
+
+        .episode-item.active {
+            border-color: var(--primary-color) !important;
+            background-color: rgba(229, 9, 20, 0.1) !important;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background-color: #000;
+            padding: 50px 5% 30px;
+            margin-top: 50px;
+            border-top: 1px solid #333;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-column ul li a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-column ul li a:hover {
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #333;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fire {
+            0%, 100% {
+                color: var(--trending-color);
+                transform: scale(1);
+            }
+            50% {
+                color: #ff8c00;
+                transform: scale(1.1);
+            }
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 1200px) {
+            .hero h2 {
+                font-size: 42px;
+            }
+            .hero p {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .modal-body {
+                grid-template-columns: 1fr;
+            }
+            .modal-poster {
+                height: 400px;
+                max-width: 300px;
+                margin: 0 auto;
+            }
+            nav ul {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .hero h2 {
+                font-size: 36px;
+            }
+            .hero p {
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-container input {
+                width: 200px;
+            }
+            .search-container input:focus {
+                width: 250px;
+            }
+            .drama-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 20px;
+            }
+            .hero h2 {
+                font-size: 32px;
+            }
+            .hero p {
+                font-size: 16px;
+            }
+            .modal-header h2 {
+                font-size: 24px;
+            }
+            .modal-actions {
+                flex-direction: column;
+            }
+            .video-player-modal .modal-content {
+                max-width: 100% !important;
+                height: 100vh !important;
+                border-radius: 0 !important;
+            }
+            .video-container {
+                aspect-ratio: 9/16 !important;
+                height: 60vh !important;
+            }
+            .control-buttons {
+                justify-content: space-around !important;
+            }
+            .volume-slider {
+                display: none !important;
+            }
+            .episode-sidebar {
+                width: 100% !important;
+                right: -100% !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            header {
+                flex-direction: column;
+                gap: 20px;
+                padding: 15px 5%;
+            }
+            header.scrolled {
+                padding: 10px 5%;
+            }
+            .search-container {
+                width: 100%;
+            }
+            .search-container input {
+                width: 100%;
+            }
+            .search-container input:focus {
+                width: 100%;
+            }
+            .hero {
+                padding: 180px 5% 60px;
+            }
+            .hero h2 {
+                font-size: 28px;
+            }
+            .hero p {
+                font-size: 16px;
+            }
+            .section-title {
+                font-size: 24px;
+            }
+            .modal-header {
+                padding: 20px;
+            }
+            .modal-body {
+                padding: 20px;
+            }
+            .modal-poster {
+                height: 350px;
+            }
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            .video-player-modal .modal-header {
+                flex-direction: column !important;
+                gap: 10px !important;
+                align-items: flex-start !important;
+            }
+            .player-controls-top {
+                width: 100% !important;
+                justify-content: space-between !important;
+            }
+            .player-btn span {
+                display: none !important;
+            }
+            .player-btn {
+                padding: 8px !important;
+                width: 40px !important;
+                height: 40px !important;
+                justify-content: center !important;
+            }
+            .episode-navigation {
+                flex-direction: column !important;
+                gap: 10px !important;
+            }
+        }
+
+        /* ===== MOBILE MENU ACTIVE STATE ===== */
+        @media (max-width: 992px) {
+            nav.active ul {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: rgba(0, 0, 0, 0.95);
+                padding: 20px;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+                z-index: 1000;
+            }
+            nav.active ul li {
+                margin: 10px 0;
+            }
+        }
+
+        /* ===== EPISODE CARD STYLES ===== */
+        .episode-card {
+            transition: all 0.3s ease;
+        }
+        .episode-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        .episode-card img {
+            transition: transform 0.5s;
+        }
+        .episode-card:hover img {
+            transform: scale(1.1);
+        }
+
+        /* ===== VIDEO ERROR STYLES ===== */
+        .video-error {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+            background-color: rgba(0, 0, 0, 0.9) !important;
+            z-index: 20 !important;
+            color: white !important;
+            text-align: center !important;
+            padding: 20px !important;
+        }
+
+        /* ===== LOADING ANIMATION ===== */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        .video-loading i {
+            animation: pulse 1.5s infinite;
         }
     </style>
 </head>
 <body>
-    <!-- Notification Area -->
-    <div id="notification" class="notification">
-        <i class="fas fa-check-circle"></i>
-        <span id="notificationText">Notification</span>
-    </div>
-    
     <!-- Header -->
     <header id="mainHeader">
         <div class="logo">
@@ -192,11 +1633,6 @@
                 <p>Memuat drama populer...</p>
             </div>
         </div>
-        
-        <!-- Test Player Button -->
-        <button class="player-test-btn" id="testPlayerBtn">
-            <i class="fas fa-video"></i> Test Video Player
-        </button>
     </main>
 
     <!-- Drama Detail Modal -->
@@ -406,6 +1842,9 @@
         </div>
     </div>
 
+    <!-- Custom Modal -->
+    <div class="drama-modal" id="customModal"></div>
+
     <!-- Loading Modal -->
     <div class="drama-modal" id="loadingModal">
         <div class="modal-content" style="max-width: 400px;">
@@ -413,21 +1852,6 @@
                 <i class="fas fa-spinner fa-spin" style="color: var(--primary-color); font-size: 50px; margin-bottom: 20px;"></i>
                 <h3 style="color: white; margin-bottom: 15px;">Memuat Detail Drama</h3>
                 <p style="color: var(--text-secondary);">Harap tunggu sebentar...</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Custom Modal -->
-    <div class="drama-modal" id="customModal">
-        <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header">
-                <h2 id="customModalTitle">Modal Title</h2>
-                <button class="close-modal" onclick="closeCustomModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body" style="padding: 30px;" id="customModalContent">
-                <!-- Content will be loaded here -->
             </div>
         </div>
     </div>
@@ -490,7 +1914,7 @@
         </div>
     </footer>
 
-    <!-- Video.js Script -->
+    <!-- JavaScript Libraries -->
     <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
     
     <!-- Main Application Script -->
@@ -530,9 +1954,6 @@
         const playBtn = document.getElementById('playBtn');
         const trailerBtn = document.getElementById('trailerBtn');
         const navLinks = document.querySelectorAll('nav a, .footer-column a[data-section]');
-        const notification = document.getElementById('notification');
-        const notificationText = document.getElementById('notificationText');
-        const testPlayerBtn = document.getElementById('testPlayerBtn');
 
         // Global variables
         let latestDramas = [];
@@ -550,35 +1971,9 @@
         let playerInitialized = false;
         let playbackHistory = [];
 
-        // Utility Functions
-        function showNotification(message, type = 'success', duration = 3000) {
-            notificationText.textContent = message;
-            notification.style.display = 'block';
-            
-            if (type === 'error') {
-                notification.style.background = 'linear-gradient(45deg, #ff6b00, #ff8c00)';
-            } else if (type === 'warning') {
-                notification.style.background = 'linear-gradient(45deg, #ffcc00, #ff9900)';
-            } else {
-                notification.style.background = 'linear-gradient(45deg, var(--primary-color), var(--secondary-color))';
-            }
-            
-            setTimeout(() => {
-                notification.style.display = 'none';
-            }, duration);
-        }
-
-        function formatDuration(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${mins}:${secs.toString().padStart(2, '0')}`;
-        }
-
         // Fetch data from APIs
         async function fetchAllData() {
             try {
-                showNotification('Memuat data drama...', 'info');
-                
                 // Fetch trending dramas
                 const trendingResponse = await fetch(API_URL_TRENDING);
                 const trendingData = await trendingResponse.json();
@@ -597,398 +1992,72 @@
                     filteredDramas = [...latestDramas];
                     displayLatestDramas();
                     displayPopularDramas();
-                    
-                    showNotification('Data drama berhasil dimuat!', 'success');
                 }
             } catch (error) {
                 console.error('Error fetching data:', error);
-                showNotification('Gagal memuat data. Silakan coba lagi nanti.', 'error');
                 showError('Gagal memuat data. Silakan coba lagi nanti.');
             }
         }
 
-        // Display trending dramas
-        function displayTrendingDramas() {
-            if (trendingDramas.length === 0) {
-                trendingGrid.innerHTML = `
-                    <div class="loading">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>Tidak ada drama trending saat ini.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            trendingGrid.innerHTML = '';
-            
-            trendingDramas.forEach(drama => {
-                const dramaCard = createDramaCard(drama, true, false);
-                trendingGrid.appendChild(dramaCard);
-            });
-        }
-
-        // Display latest dramas
-        function displayLatestDramas() {
-            if (filteredDramas.length === 0) {
-                latestGrid.innerHTML = `
-                    <div class="loading">
-                        <i class="fas fa-search"></i>
-                        <p>Tidak ada drama yang ditemukan.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            latestGrid.innerHTML = '';
-            
-            filteredDramas.forEach(drama => {
-                const dramaCard = createDramaCard(drama, false, false);
-                latestGrid.appendChild(dramaCard);
-            });
-        }
-
-        // Display popular dramas
-        function displayPopularDramas() {
-            const popularDramas = latestDramas.filter(drama => drama.is_hot === "1");
-            
-            if (popularDramas.length === 0) {
-                popularGrid.innerHTML = `
-                    <div class="loading">
-                        <i class="fas fa-fire"></i>
-                        <p>Tidak ada drama populer saat ini.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            popularGrid.innerHTML = '';
-            
-            popularDramas.slice(0, 6).forEach(drama => {
-                const dramaCard = createDramaCard(drama, false, false);
-                popularGrid.appendChild(dramaCard);
-            });
-        }
-
-        // Create drama card element
-        function createDramaCard(drama, isTrending = false, isSearchResult = false) {
-            const dramaCard = document.createElement('div');
-            let cardClass = 'drama-card';
-            let badgeClass = '';
-            let btnClass = 'watch-btn';
-            
-            if (isTrending) {
-                cardClass += ' trending';
-                badgeClass = 'trending-badge';
-                btnClass += ' trending';
-            } else if (isSearchResult) {
-                cardClass += ' search-result';
-                badgeClass = 'search-badge';
-                btnClass += ' search-result';
-            }
-            
-            dramaCard.className = cardClass;
-            dramaCard.setAttribute('data-category', getDramaCategory(drama));
-            
-            // Extract categories from stat_infos
-            const categories = drama.stat_infos ? drama.stat_infos.join(', ') : 'Drama';
-            const episodeCount = drama.serial_count || '0';
-            const author = drama.author || 'Tidak diketahui';
-            
-            dramaCard.innerHTML = `
-                <div class="card-image">
-                    <img src="${drama.thumb_url}" alt="${drama.book_name}" 
-                         onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80';">
-                    <div class="age-badge">${drama.age_gate || '18'}+</div>
-                    ${isTrending ? `
-                        <div class="trending-badge">
-                            <i class="fas fa-fire"></i> Trending
-                        </div>
-                    ` : ''}
-                    ${isSearchResult ? `
-                        <div class="search-badge">
-                            <i class="fas fa-search"></i> Hasil Pencarian
-                        </div>
-                    ` : ''}
-                </div>
-                <div class="drama-info">
-                    <h3>${drama.book_name}</h3>
-                    <p>${drama.abstract ? drama.abstract.substring(0, 120) + '...' : 'Tidak ada deskripsi.'}</p>
-                    <div class="drama-meta">
-                        <span><i class="fas fa-user"></i> ${author}</span>
-                        <span><i class="fas fa-list"></i> ${episodeCount} Episode</span>
-                    </div>
-                    <button class="${btnClass}" data-id="${drama.book_id}">
-                        <i class="fas fa-play"></i> Tonton
-                    </button>
-                </div>
-            `;
-            
-            // Add click events
-            const watchBtn = dramaCard.querySelector('.watch-btn');
-            watchBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                openDramaModal(drama);
-            });
-            
-            dramaCard.addEventListener('click', (e) => {
-                if (!e.target.classList.contains('watch-btn')) {
-                    openDramaModal(drama);
-                }
-            });
-            
-            return dramaCard;
-        }
-
-        // Get drama category for filtering
-        function getDramaCategory(drama) {
-            if (drama.stat_infos && drama.stat_infos.join(' ').toLowerCase().includes('romans')) {
-                return 'romance';
-            } else if (drama.stat_infos && drama.stat_infos.join(' ').toLowerCase().includes('fantas')) {
-                return 'fantasy';
-            } else if (drama.is_hot === "1") {
-                return 'hot';
-            } else {
-                return 'drama';
-            }
-        }
-
-        // Search dramas
-        async function searchDramas(query) {
-            if (!query || query.trim().length < 2) {
-                searchResults.classList.remove('active');
-                return;
-            }
-            
-            try {
-                searchResults.innerHTML = `
-                    <div class="loading" style="padding: 20px;">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <p>Mencari drama...</p>
-                    </div>
-                `;
-                searchResults.classList.add('active');
-                
-                const encodedQuery = encodeURIComponent(query.trim());
-                const searchResponse = await fetch(`${API_URL_SEARCH}${encodedQuery}&limit=10&offset=0`);
-                const searchData = await searchResponse.json();
-                
-                if (searchData && searchData.code === 0 && searchData.data && searchData.data.search_data) {
-                    searchDramas = [];
-                    searchData.data.search_data.forEach(item => {
-                        if (item.books && item.books.length > 0) {
-                            searchDramas.push(...item.books);
-                        }
-                    });
-                    
-                    displaySearchResults(searchDramas, query);
-                } else {
-                    showNoSearchResults(query);
-                }
-            } catch (error) {
-                console.error('Error searching:', error);
-                searchResults.innerHTML = `
-                    <div class="loading" style="padding: 20px;">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>Gagal melakukan pencarian.</p>
-                    </div>
-                `;
-            }
-        }
-
-        // Display search results in dropdown
-        function displaySearchResults(dramas, query) {
-            if (dramas.length === 0) {
-                showNoSearchResults(query);
-                return;
-            }
-            
-            searchResults.innerHTML = '';
-            
-            // Show top 5 results in dropdown
-            const topResults = dramas.slice(0, 5);
-            
-            topResults.forEach(drama => {
-                const resultItem = document.createElement('div');
-                resultItem.className = 'search-result-item';
-                resultItem.innerHTML = `
-                    <img src="${drama.thumb_url}" alt="${drama.book_name}" 
-                         onerror="this.src='https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80'">
-                    <div class="search-result-info">
-                        <h4>${highlightText(drama.book_name, query)}</h4>
-                        <p>${drama.abstract ? drama.abstract.substring(0, 80) + '...' : 'Tidak ada deskripsi.'}</p>
-                    </div>
-                `;
-                
-                resultItem.addEventListener('click', () => {
-                    openDramaModal(drama);
-                    searchResults.classList.remove('active');
-                    searchInput.value = '';
-                });
-                
-                searchResults.appendChild(resultItem);
-            });
-            
-            // Add "View All Results" button if there are more results
-            if (dramas.length > 5) {
-                const viewAllBtn = document.createElement('div');
-                viewAllBtn.className = 'view-all-results';
-                viewAllBtn.textContent = `Lihat semua ${dramas.length} hasil`;
-                viewAllBtn.addEventListener('click', () => {
-                    showFullSearchResults(dramas, query);
-                    searchResults.classList.remove('active');
-                });
-                searchResults.appendChild(viewAllBtn);
-            }
-        }
-
-        // Show full search results in main section
-        function showFullSearchResults(dramas, query) {
-            // Hide other sections
-            document.querySelectorAll('.section-title').forEach(title => {
-                if (!title.id.includes('searchResults')) {
-                    title.style.display = 'none';
-                }
-            });
-            
-            document.querySelectorAll('.drama-grid').forEach(grid => {
-                if (!grid.id.includes('searchResults')) {
-                    grid.style.display = 'none';
-                }
-            });
-            
-            document.querySelector('.filter-container').style.display = 'none';
-            
-            // Show search results section
-            searchResultsSection.classList.add('active');
-            searchResultsTitle.innerHTML = `<i class="fas fa-search"></i> Hasil Pencarian: "${query}"`;
-            
-            if (dramas.length === 0) {
-                searchResultsGrid.innerHTML = `
-                    <div class="no-results">
-                        <i class="fas fa-search"></i>
-                        <h3>Tidak ada hasil untuk "${query}"</h3>
-                        <p>Coba gunakan kata kunci yang berbeda atau periksa ejaan.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            searchResultsGrid.innerHTML = '';
-            
-            dramas.forEach(drama => {
-                const dramaCard = createDramaCard(drama, false, true);
-                searchResultsGrid.appendChild(dramaCard);
-            });
-            
-            // Scroll to search results
-            searchResultsSection.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Highlight text in search results
-        function highlightText(text, query) {
-            if (!text || !query) return text;
-            
-            const lowerText = text.toLowerCase();
-            const lowerQuery = query.toLowerCase();
-            const index = lowerText.indexOf(lowerQuery);
-            
-            if (index === -1) return text;
-            
-            const before = text.substring(0, index);
-            const match = text.substring(index, index + query.length);
-            const after = text.substring(index + query.length);
-            
-            return `${before}<span style="color: var(--search-color); font-weight: bold;">${match}</span>${after}`;
-        }
-
-        // Show no search results
-        function showNoSearchResults(query) {
-            searchResults.innerHTML = `
-                <div class="search-result-item" style="text-align: center; padding: 30px 20px;">
-                    <i class="fas fa-search" style="font-size: 24px; color: var(--text-secondary); margin-bottom: 10px;"></i>
-                    <p style="color: var(--text-secondary);">Tidak ada hasil untuk "${query}"</p>
-                </div>
-            `;
-        }
-
-        // Open drama modal
-        async function openDramaModal(drama) {
-            currentDrama = drama;
-            
-            // Show basic info immediately
-            showBasicDramaInfo(drama);
-            
-            // Fetch detailed info
+        // Fetch drama detail
+        async function fetchDramaDetail(dramaId) {
             try {
                 showLoadingModal();
                 
-                const [detailResponse, episodesResponse] = await Promise.all([
-                    fetch(`${API_URL_DETAIL}/${drama.book_id}`),
-                    fetch(`${API_URL_EPISODES}/${drama.book_id}?limit=10`)
+                const [detailResponse, episodesResponse, metadataResponse] = await Promise.all([
+                    fetch(`${API_URL_DETAIL}/${dramaId}`),
+                    fetch(`${API_URL_EPISODES}/${dramaId}?limit=10`),
+                    fetch(`${API_URL_METADATA}/${dramaId}`)
                 ]);
                 
                 const detailData = await detailResponse.json();
                 const episodesData = await episodesResponse.json();
+                const metadataData = await metadataResponse.json();
                 
                 if (detailData.code === 0 && detailData.data) {
                     currentDramaDetail = detailData.data;
                     currentEpisodes = episodesData.data?.episodes || [];
-                    displayDramaDetail(detailData.data);
+                    const metadata = metadataData.data;
+                    
+                    displayDramaDetail(detailData.data, metadata);
+                    hideLoadingModal();
+                    return true;
                 } else {
                     throw new Error('Failed to fetch drama details');
                 }
-                
-                hideLoadingModal();
             } catch (error) {
                 console.error('Error fetching drama detail:', error);
                 hideLoadingModal();
-                displayBasicDramaInfo(drama);
-                showNotification('Gagal memuat detail lengkap, menampilkan info dasar.', 'warning');
+                showModalError('Gagal memuat detail drama. Silakan coba lagi.');
+                return false;
             }
         }
 
-        // Show basic drama info while loading
-        function showBasicDramaInfo(drama) {
-            document.getElementById('modalTitle').textContent = drama.book_name;
-            document.getElementById('modalName').textContent = drama.book_name;
-            document.getElementById('modalDescription').textContent = 
-                drama.abstract ? drama.abstract.substring(0, 200) + '...' : 'Tidak ada deskripsi.';
-            
-            const modalPoster = document.getElementById('modalPoster');
-            modalPoster.src = drama.thumb_url || '';
-            modalPoster.alt = drama.book_name;
-            modalPoster.onerror = function() {
-                this.onerror = null;
-                this.src = 'https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80';
-            };
-            
-            const detailsList = document.getElementById('modalDetails');
-            const episodeCount = drama.serial_count || '0';
-            const author = drama.author || 'Tidak diketahui';
-            
-            detailsList.innerHTML = `
-                <li><i class="fas fa-user-edit"></i> <strong>Penulis:</strong> ${author}</li>
-                <li><i class="fas fa-list-ol"></i> <strong>Episode:</strong> ${episodeCount}</li>
-                <li><i class="fas fa-spinner fa-spin"></i> <strong>Status:</strong> Memuat detail...</li>
-            `;
-            
-            playBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memuat...`;
-            playBtn.disabled = true;
-            trailerBtn.disabled = true;
-            
-            // Show modal
-            dramaModal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-
-        // Display drama detail
-        function displayDramaDetail(detailData) {
+        // Display drama detail in modal
+        function displayDramaDetail(detailData, metadata) {
             const videoData = detailData.video_data;
             
             if (!videoData) {
                 showModalError('Data drama tidak tersedia.');
                 return;
             }
+            
+            // Update modal title
+            document.getElementById('modalTitle').textContent = videoData.series_title || 'Judul Drama';
+            document.getElementById('modalName').textContent = videoData.series_title || 'Judul Drama';
+            
+            // Update description
+            document.getElementById('modalDescription').textContent = 
+                videoData.series_intro || 'Tidak ada deskripsi.';
+            
+            // Update poster
+            const modalPoster = document.getElementById('modalPoster');
+            modalPoster.src = videoData.series_cover || '';
+            modalPoster.alt = videoData.series_title || 'Drama Poster';
+            modalPoster.onerror = function() {
+                this.onerror = null;
+                this.src = 'https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80';
+            };
             
             // Update modal details
             const detailsList = document.getElementById('modalDetails');
@@ -1017,266 +2086,121 @@
                 <li><i class="fas fa-play-circle"></i> <strong>Ditonton:</strong> ${playCount} kali</li>
                 <li><i class="fas fa-user-shield"></i> <strong>Rating Usia:</strong> ${ageRating}+</li>
                 <li><i class="fas fa-check-circle"></i> <strong>Status:</strong> ${status}</li>
+                <li><i class="fas fa-download"></i> <strong>Dapat Diunduh:</strong> ${videoData.download_config?.can_download ? 'Ya' : 'Tidak'}</li>
             `;
             
             // Update episode count in play button
             playBtn.innerHTML = `<i class="fas fa-play"></i> Tonton Episode 1 (dari ${totalEpisodes})`;
-            playBtn.disabled = false;
-            trailerBtn.disabled = false;
             
             // Update modal actions
             playBtn.onclick = () => {
-                if (currentEpisodes.length > 0 && currentEpisodes[0].vid) {
-                    playVideoStream(currentEpisodes[0].vid, {
-                        title: `Episode 1 - ${videoData.series_title}`,
-                        description: currentEpisodes[0].title || videoData.series_intro,
-                        episodeNumber: 1,
-                        seriesId: videoData.series_id_str
-                    });
-                    closeDramaModal();
-                } else {
-                    showNotification('Episode tidak tersedia untuk streaming.', 'warning');
+                if (currentDramaDetail) {
+                    playEpisode(1);
                 }
             };
             
             trailerBtn.onclick = () => {
-                showCustomModal('Trailer', `
-                    <div style="text-align: center;">
-                        <h3 style="margin-bottom: 20px; color: var(--primary-color);">
-                            <i class="fas fa-film"></i> Trailer ${videoData.series_title}
-                        </h3>
-                        <div style="background-color: #000; border-radius: 10px; padding: 20px; margin-bottom: 20px; min-height: 200px; display: flex; align-items: center; justify-content: center;">
-                            <div>
-                                <i class="fas fa-video" style="color: var(--primary-color); font-size: 60px; margin-bottom: 20px;"></i>
-                                <p style="color: var(--text-secondary);">Trailer akan dimuat di sini</p>
+                if (currentDramaDetail) {
+                    showTrailer();
+                }
+            };
+            
+            // Add episodes section if available
+            addEpisodesSection();
+            
+            // Show modal
+            dramaModal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Add episodes section to modal
+        function addEpisodesSection() {
+            // Remove existing episodes section if any
+            const existingEpisodesSection = document.querySelector('.modal-episodes-section');
+            if (existingEpisodesSection) {
+                existingEpisodesSection.remove();
+            }
+            
+            if (currentEpisodes.length === 0) return;
+            
+            const modalInfo = document.querySelector('.modal-info');
+            
+            const episodesSection = document.createElement('div');
+            episodesSection.className = 'modal-episodes-section';
+            episodesSection.innerHTML = `
+                <h3 style="margin-top: 30px; margin-bottom: 20px; color: white; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px;">
+                    <i class="fas fa-film"></i> Daftar Episode
+                </h3>
+                <div class="episodes-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                    ${currentEpisodes.slice(0, 10).map((episode, index) => `
+                        <div class="episode-card" style="background-color: var(--card-bg); border-radius: 8px; overflow: hidden; cursor: pointer; transition: transform 0.3s;" 
+                             data-episode="${episode.vid_index}" data-vid="${episode.vid}">
+                            <div class="episode-thumb" style="position: relative; height: 100px; overflow: hidden;">
+                                <img src="${episode.cover || episode.episode_cover}" 
+                                     alt="Episode ${episode.vid_index}"
+                                     style="width: 100%; height: 100%; object-fit: cover;"
+                                     onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80';">
+                                <div class="episode-number" style="position: absolute; bottom: 5px; right: 5px; background-color: rgba(0,0,0,0.8); color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">
+                                    ${episode.vid_index}
+                                </div>
+                            </div>
+                            <div class="episode-info" style="padding: 10px;">
+                                <div style="font-size: 12px; color: var(--text-secondary); display: flex; justify-content: space-between;">
+                                    <span>${formatDuration(episode.duration || 0)}</span>
+                                    <span>${episode.digged_count ? episode.digged_count.toLocaleString() : '0'} ❤️</span>
+                                </div>
                             </div>
                         </div>
-                        <p style="color: var(--text-secondary); margin-bottom: 30px;">
-                            Fitur trailer dalam pengembangan.
-                        </p>
-                        <button onclick="closeCustomModal()" class="watch-btn" style="padding: 12px 30px;">
-                            <i class="fas fa-times"></i> Tutup
-                        </button>
-                    </div>
-                `, false);
-            };
-        }
-
-        // Display basic drama info (fallback)
-        function displayBasicDramaInfo(drama) {
-            const detailsList = document.getElementById('modalDetails');
-            const categories = drama.stat_infos ? drama.stat_infos.join(', ') : 'Drama';
-            const episodeCount = drama.serial_count || '0';
-            const author = drama.author || 'Tidak diketahui';
-            const status = drama.show_creation_status || 'Selesai';
-            const source = drama.source || 'Tidak diketahui';
-            const createTime = drama.create_time ? new Date(drama.create_time).toLocaleDateString('id-ID') : 'Tidak diketahui';
-            
-            detailsList.innerHTML = `
-                <li><i class="fas fa-user-edit"></i> <strong>Penulis:</strong> ${author}</li>
-                <li><i class="fas fa-list-ol"></i> <strong>Episode:</strong> ${episodeCount}</li>
-                <li><i class="fas fa-check-circle"></i> <strong>Status:</strong> ${status}</li>
-                <li><i class="fas fa-tags"></i> <strong>Kategori:</strong> ${categories}</li>
-                <li><i class="fas fa-calendar-alt"></i> <strong>Rilis:</strong> ${createTime}</li>
-                <li><i class="fas fa-database"></i> <strong>Sumber:</strong> ${source}</li>
-                <li><i class="fas fa-user-shield"></i> <strong>Rating Usia:</strong> ${drama.age_gate || '18'}+</li>
-            `;
-            
-            playBtn.innerHTML = `<i class="fas fa-play"></i> Tonton Sekarang`;
-            playBtn.disabled = false;
-            trailerBtn.disabled = false;
-            
-            playBtn.onclick = () => {
-                showCustomModal('Streaming', `
-                    <div style="text-align: center;">
-                        <h3 style="margin-bottom: 20px; color: var(--primary-color);">
-                            <i class="fas fa-play-circle"></i> Streaming Drama
-                        </h3>
-                        <p style="margin-bottom: 20px;">
-                            Episode 1 dari <strong>${drama.book_name}</strong> akan segera dimulai...
-                        </p>
-                        <div style="background-color: var(--light-bg); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
-                            <p style="color: var(--text-secondary); font-style: italic;">
-                                "Player video akan dimuat di sini"
-                            </p>
-                            <div class="loading" style="margin: 20px 0;">
-                                <i class="fas fa-spinner fa-spin" style="color: var(--primary-color); font-size: 30px;"></i>
-                            </div>
-                        </div>
-                        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 30px;">
-                            <i class="fas fa-info-circle"></i> Untuk streaming langsung, pastikan video ID tersedia.
-                        </p>
-                        <button onclick="testStreamAPI()" class="trailer-btn" style="margin-right: 10px;">
-                            <i class="fas fa-video"></i> Test Stream API
-                        </button>
-                        <button onclick="closeCustomModal()" class="watch-btn">
-                            <i class="fas fa-times"></i> Tutup
-                        </button>
-                    </div>
-                `, false);
-            };
-            
-            trailerBtn.onclick = () => {
-                showCustomModal('Trailer', `
-                    <div style="text-align: center;">
-                        <h3 style="margin-bottom: 20px; color: var(--primary-color);">
-                            <i class="fas fa-film"></i> Trailer ${drama.book_name}
-                        </h3>
-                        <p style="color: var(--text-secondary); margin-bottom: 30px;">
-                            Trailer untuk drama ini sedang tidak tersedia.
-                        </p>
-                        <button onclick="closeCustomModal()" class="watch-btn" style="padding: 12px 30px;">
-                            <i class="fas fa-times"></i> Tutup
-                        </button>
-                    </div>
-                `, false);
-            };
-        }
-
-        // Show error message
-        function showError(message) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'loading';
-            errorDiv.innerHTML = `
-                <i class="fas fa-exclamation-triangle"></i>
-                <p>${message}</p>
-            `;
-            
-            trendingGrid.innerHTML = '';
-            trendingGrid.appendChild(errorDiv.cloneNode(true));
-            
-            latestGrid.innerHTML = '';
-            latestGrid.appendChild(errorDiv.cloneNode(true));
-            
-            popularGrid.innerHTML = '';
-            popularGrid.appendChild(errorDiv.cloneNode(true));
-        }
-
-        // Show modal error
-        function showModalError(message) {
-            showCustomModal('Terjadi Kesalahan', `
-                <div style="text-align: center;">
-                    <div style="margin-bottom: 20px;">
-                        <i class="fas fa-exclamation-triangle" style="color: #ff6b00; font-size: 50px;"></i>
-                    </div>
-                    <p style="margin-bottom: 20px; font-size: 18px;">${message}</p>
-                    <button onclick="closeCustomModal()" class="watch-btn" style="padding: 12px 30px;">
-                        <i class="fas fa-times"></i> Tutup
-                    </button>
+                    `).join('')}
                 </div>
-            `, true);
-        }
-
-        // Show loading modal
-        function showLoadingModal() {
-            document.getElementById('loadingModal').style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-
-        // Hide loading modal
-        function hideLoadingModal() {
-            document.getElementById('loadingModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-
-        // Show custom modal
-        function showCustomModal(title, content, showClose = true) {
-            const modal = document.getElementById('customModal');
-            document.getElementById('customModalTitle').textContent = title;
-            document.getElementById('customModalContent').innerHTML = content;
+                ${currentEpisodes.length > 10 ? `
+                    <button id="loadMoreEpisodes" class="filter-btn" style="width: 100%; justify-content: center;">
+                        <i class="fas fa-plus"></i> Muat Lebih Banyak Episode
+                    </button>
+                ` : ''}
+            `;
             
-            const closeBtn = modal.querySelector('.close-modal');
-            closeBtn.style.display = showClose ? 'block' : 'none';
+            modalInfo.appendChild(episodesSection);
             
-            modal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-
-        // Close custom modal
-        function closeCustomModal() {
-            document.getElementById('customModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-
-        // Close drama modal
-        function closeDramaModal() {
-            dramaModal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-            currentDrama = null;
-            currentDramaDetail = null;
-            currentEpisodes = [];
-            
-            // Reset buttons
-            playBtn.innerHTML = `<i class="fas fa-play"></i> Tonton Sekarang`;
-            playBtn.disabled = false;
-            trailerBtn.disabled = false;
-        }
-
-        // Filter dramas by category
-        function filterDramas(category) {
-            if (category === 'all') {
-                filteredDramas = [...latestDramas];
-            } else if (category === 'hot') {
-                filteredDramas = latestDramas.filter(drama => drama.is_hot === "1");
-            } else {
-                filteredDramas = latestDramas.filter(drama => {
-                    const dramaCategory = getDramaCategory(drama);
-                    return dramaCategory === category;
+            // Add click event to episode cards
+            document.querySelectorAll('.episode-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const episodeNumber = this.getAttribute('data-episode');
+                    const vid = this.getAttribute('data-vid');
+                    playEpisode(episodeNumber, vid);
                 });
+            });
+            
+            // Add click event to load more button
+            const loadMoreBtn = document.getElementById('loadMoreEpisodes');
+            if (loadMoreBtn) {
+                loadMoreBtn.addEventListener('click', loadMoreEpisodes);
             }
-            
-            displayLatestDramas();
         }
 
-        // Scroll to section
-        function scrollToSection(sectionId) {
-            // Reset search results section
-            searchResultsSection.classList.remove('active');
-            
-            // Show all sections
-            document.querySelectorAll('.section-title').forEach(title => {
-                title.style.display = 'block';
-            });
-            
-            document.querySelectorAll('.drama-grid').forEach(grid => {
-                grid.style.display = 'grid';
-            });
-            
-            document.querySelector('.filter-container').style.display = 'flex';
-            
-            const section = document.getElementById(sectionId);
-            if (section) {
-                window.scrollTo({
-                    top: section.offsetTop - 80,
-                    behavior: 'smooth'
-                });
+        // Load more episodes
+        async function loadMoreEpisodes() {
+            try {
+                if (!currentDrama) return;
                 
-                // Update active nav link
-                document.querySelectorAll('nav a').forEach(link => {
-                    link.classList.remove('active');
-                });
+                const currentCount = currentEpisodes.length;
+                const response = await fetch(`${API_URL_EPISODES}/${currentDrama.book_id}?limit=20&page=${Math.ceil(currentCount / 20) + 1}`);
+                const data = await response.json();
                 
-                const activeLink = document.querySelector(`nav a[data-section="${sectionId}"]`);
-                if (activeLink) {
-                    activeLink.classList.add('active');
+                if (data.code === 0 && data.data && data.data.episodes) {
+                    currentEpisodes = [...currentEpisodes, ...data.data.episodes];
+                    addEpisodesSection();
+                    
+                    // Scroll to episodes section
+                    const episodesSection = document.querySelector('.modal-episodes-section');
+                    if (episodesSection) {
+                        episodesSection.scrollIntoView({ behavior: 'smooth' });
+                    }
                 }
+            } catch (error) {
+                console.error('Error loading more episodes:', error);
+                showModalError('Gagal memuat episode tambahan.');
             }
-        }
-
-        // Close search results when clicking outside
-        function closeSearchResults(e) {
-            if (!searchResults.contains(e.target) && !searchInput.contains(e.target) && !searchBtn.contains(e.target)) {
-                searchResults.classList.remove('active');
-            }
-        }
-
-        // VIDEO PLAYER FUNCTIONS
-        // Initialize video player
-        function initializeVideoPlayer() {
-            if (playerInitialized) return;
-            
-            playerInitialized = true;
-            console.log('Video player initialized');
         }
 
         // Play video stream
@@ -1319,7 +2243,8 @@
                     await loadEpisodeList(episodeInfo.seriesId, episodeInfo.episodeNumber);
                 }
                 
-                showNotification('Video stream loaded successfully!', 'success');
+                // Record playback start
+                recordPlaybackStart(videoId, episodeInfo);
                 
             } catch (error) {
                 console.error('Error playing video:', error);
@@ -1330,42 +2255,54 @@
         // Load video stream
         async function loadVideoStream(videoId, quality = 'auto') {
             try {
-                showPlayerLoading('Loading stream...');
-                
-                const response = await fetch(`${API_URL_STREAM}/${videoId}`);
+                const response = await fetch(`${API_URL_STREAM_QUALITY}/${videoId}?quality=${quality}`);
                 const data = await response.json();
                 
-                if (data.code === 0 && data.data && data.data.main_url) {
+                if (data.code === 0 && data.data) {
                     currentStreamData = data.data;
                     
                     // Get video URL
-                    const videoUrl = data.data.main_url;
+                    let videoUrl;
+                    if (quality === 'auto' || !data.data.selected_url) {
+                        videoUrl = data.data.main_url;
+                    } else {
+                        videoUrl = data.data.selected_url;
+                    }
+                    
+                    // Validate URL
+                    if (!videoUrl || !videoUrl.startsWith('http')) {
+                        throw new Error('Invalid video URL');
+                    }
                     
                     // Load video into player
-                    const videoElement = document.getElementById('mainVideoPlayer');
+                    const videoElement = videoPlayer || document.getElementById('mainVideoPlayer');
                     
-                    if (typeof videojs !== 'undefined') {
-                        if (!videoPlayer) {
-                            videoPlayer = videojs('mainVideoPlayer', {
-                                controls: true,
-                                autoplay: true,
-                                preload: 'auto',
-                                responsive: true,
-                                fluid: true
-                            });
-                        }
-                        
+                    if (videoPlayer) {
                         videoPlayer.src({
                             src: videoUrl,
                             type: 'video/mp4'
                         });
                         
-                        videoPlayer.play();
+                        // Add backup source if available
+                        if (data.data.backup_url || data.data.selected_backup) {
+                            videoPlayer.ready(() => {
+                                const backupUrl = data.data.selected_backup || data.data.backup_url;
+                                // In a real implementation, you would handle backup sources
+                                console.log('Backup URL available:', backupUrl);
+                            });
+                        }
+                        
+                        videoPlayer.load();
+                        videoPlayer.play().catch(e => {
+                            console.log('Autoplay prevented:', e);
+                            // Show play button
+                        });
                     } else {
                         videoElement.src = videoUrl;
                         videoElement.load();
                         videoElement.play().catch(e => {
                             console.log('Autoplay prevented:', e);
+                            // Show play button
                         });
                     }
                     
@@ -1379,187 +2316,179 @@
                 }
             } catch (error) {
                 console.error('Error loading video stream:', error);
-                hidePlayerLoading();
                 
-                // Show simulation mode
-                showCustomModal('Stream Simulation', `
-                    <div style="text-align: center;">
-                        <h3 style="margin-bottom: 20px; color: var(--primary-color);">
-                            <i class="fas fa-video"></i> Stream Demo Mode
-                        </h3>
-                        <p style="margin-bottom: 20px;">
-                            Video ID: <strong>${videoId}</strong>
-                        </p>
-                        <div style="background-color: #000; border-radius: 10px; padding: 30px; margin-bottom: 20px;">
-                            <i class="fas fa-play-circle" style="color: white; font-size: 60px; margin-bottom: 20px;"></i>
-                            <p style="color: white;">Video Player Simulation</p>
-                            <p style="color: var(--text-secondary); font-size: 14px; margin-top: 10px;">
-                                Stream URL would be loaded here
-                            </p>
-                        </div>
-                        <p style="color: var(--text-secondary); margin-bottom: 30px;">
-                            In production, the actual video stream would play here.
-                        </p>
-                        <button onclick="closeCustomModal()" class="watch-btn" style="padding: 12px 30px;">
-                            <i class="fas fa-times"></i> Close
-                        </button>
-                    </div>
-                `, true);
-                
-                return false;
-            }
-        }
-
-        // Load quality options
-        async function loadQualityOptions(videoId) {
-            try {
-                const response = await fetch(`${API_URL_STREAM_QUALITY}/${videoId}?quality=auto`);
-                const data = await response.json();
-                
-                if (data.code === 0 && data.data && data.data.quality_options) {
-                    const qualityOptions = document.getElementById('qualityOptions');
-                    qualityOptions.innerHTML = '';
+                // Try fallback to basic stream endpoint
+                try {
+                    const fallbackResponse = await fetch(`${API_URL_STREAM}/${videoId}`);
+                    const fallbackData = await fallbackResponse.json();
                     
-                    // Add auto option
-                    const autoOption = document.createElement('div');
-                    autoOption.className = `quality-option ${currentQuality === 'auto' ? 'active' : ''}`;
-                    autoOption.setAttribute('data-quality', 'auto');
-                    autoOption.innerHTML = `
-                        <i class="fas fa-magic"></i>
-                        <span>Auto (Recommended)</span>
-                        <span class="quality-desc">Best for your connection</span>
-                    `;
-                    autoOption.addEventListener('click', () => {
-                        document.querySelectorAll('.quality-option').forEach(opt => opt.classList.remove('active'));
-                        autoOption.classList.add('active');
-                    });
-                    qualityOptions.appendChild(autoOption);
-                    
-                    // Add other quality options
-                    Object.keys(data.data.quality_options).forEach(qualityKey => {
-                        const quality = data.data.quality_options[qualityKey];
+                    if (fallbackData.code === 0 && fallbackData.data && fallbackData.data.main_url) {
+                        // Use basic stream URL
+                        const videoElement = videoPlayer || document.getElementById('mainVideoPlayer');
                         
-                        const option = document.createElement('div');
-                        option.className = `quality-option ${currentQuality === quality.definition ? 'active' : ''}`;
-                        option.setAttribute('data-quality', quality.definition);
-                        option.innerHTML = `
-                            <i class="fas fa-hd"></i>
-                            <span>${quality.definition.toUpperCase()}</span>
-                            <span class="quality-desc">${quality.vwidth}x${quality.vheight}</span>
-                        `;
-                        option.addEventListener('click', () => {
-                            document.querySelectorAll('.quality-option').forEach(opt => opt.classList.remove('active'));
-                            option.classList.add('active');
-                        });
-                        qualityOptions.appendChild(option);
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading quality options:', error);
-            }
-        }
-
-        // Load subtitles
-        async function loadSubtitles(videoId) {
-            try {
-                const response = await fetch(`${API_URL_SUBTITLES}/${videoId}`);
-                const data = await response.json();
-                
-                if (data.code === 0 && data.data) {
-                    const subtitleOptions = document.getElementById('subtitleOptions');
-                    
-                    if (data.data.available && data.data.subtitles && data.data.subtitles.length > 0) {
-                        subtitleOptions.innerHTML = '';
-                        
-                        // Add "None" option
-                        const noneOption = document.createElement('div');
-                        noneOption.className = 'subtitle-option active';
-                        noneOption.setAttribute('data-subtitle', 'none');
-                        noneOption.innerHTML = `
-                            <i class="fas fa-ban"></i>
-                            <span>None</span>
-                        `;
-                        noneOption.addEventListener('click', () => {
-                            document.querySelectorAll('.subtitle-option').forEach(opt => opt.classList.remove('active'));
-                            noneOption.classList.add('active');
-                        });
-                        subtitleOptions.appendChild(noneOption);
-                        
-                        // Add subtitle options
-                        data.data.subtitles.forEach(subtitle => {
-                            const option = document.createElement('div');
-                            option.className = 'subtitle-option';
-                            option.setAttribute('data-subtitle', subtitle.language_code);
-                            option.innerHTML = `
-                                <i class="fas fa-flag"></i>
-                                <span>${subtitle.language}</span>
-                            `;
-                            option.addEventListener('click', () => {
-                                document.querySelectorAll('.subtitle-option').forEach(opt => opt.classList.remove('active'));
-                                option.classList.add('active');
+                        if (videoPlayer) {
+                            videoPlayer.src({
+                                src: fallbackData.data.main_url,
+                                type: 'video/mp4'
                             });
-                            subtitleOptions.appendChild(option);
-                        });
+                            videoPlayer.load();
+                        } else {
+                            videoElement.src = fallbackData.data.main_url;
+                            videoElement.load();
+                        }
+                        
+                        updateStreamInfoUI(fallbackData.data);
+                        hidePlayerLoading();
+                        return true;
                     }
+                } catch (fallbackError) {
+                    console.error('Fallback also failed:', fallbackError);
                 }
-            } catch (error) {
-                console.error('Error loading subtitles:', error);
-            }
-        }
-
-        // Load episode list
-        async function loadEpisodeList(seriesId, currentEpisodeNumber) {
-            try {
-                // Fetch episodes from the detail endpoint
-                const response = await fetch(`${API_URL_DETAIL}/${seriesId}`);
-                const data = await response.json();
                 
-                if (data.code === 0 && data.data && data.data.video_data && data.data.video_data.video_list) {
-                    const episodes = data.data.video_data.video_list;
-                    const episodeList = document.getElementById('episodeList');
-                    episodeList.innerHTML = '';
-                    
-                    episodes.forEach(episode => {
-                        const episodeItem = document.createElement('div');
-                        episodeItem.className = `episode-item ${episode.vid_index == currentEpisodeNumber ? 'active' : ''}`;
-                        episodeItem.setAttribute('data-vid', episode.vid);
-                        episodeItem.setAttribute('data-episode', episode.vid_index);
-                        episodeItem.innerHTML = `
-                            <div class="episode-thumb">
-                                <img src="${episode.cover || episode.episode_cover}" 
-                                     alt="Episode ${episode.vid_index}"
-                                     onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80';">
-                                <div class="episode-number">${episode.vid_index}</div>
-                            </div>
-                            <div class="episode-info">
-                                <div class="episode-title">Episode ${episode.vid_index}</div>
-                                <div class="episode-meta">
-                                    <span>${formatDuration(episode.duration || 0)}</span>
-                                    <span>${episode.digged_count ? episode.digged_count.toLocaleString() : '0'} ❤️</span>
-                                </div>
-                            </div>
-                        `;
-                        
-                        episodeItem.addEventListener('click', () => {
-                            playEpisodeFromList(episode.vid, episode.vid_index, episode);
-                        });
-                        
-                        episodeList.appendChild(episodeItem);
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading episode list:', error);
+                throw error;
             }
         }
 
-        // Play episode from list
-        function playEpisodeFromList(videoId, episodeNumber, episodeInfo) {
-            playVideoStream(videoId, {
-                title: `Episode ${episodeNumber}`,
-                description: episodeInfo.title || 'No description available',
-                episodeNumber: episodeNumber,
-                seriesId: episodeInfo.series_id
+        // Initialize video player
+        function initializeVideoPlayer() {
+            if (playerInitialized) return;
+            
+            if (typeof videojs !== 'undefined') {
+                videoPlayer = videojs('mainVideoPlayer', {
+                    controls: false,
+                    autoplay: false,
+                    preload: 'auto',
+                    responsive: true,
+                    fluid: true,
+                    playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 2],
+                    controlBar: false
+                });
+                
+                // Setup video player events
+                setupVideoPlayerEvents();
+            }
+            
+            playerInitialized = true;
+        }
+
+        // Setup video player events
+        function setupVideoPlayerEvents() {
+            if (!videoPlayer) return;
+            
+            const videoElement = document.getElementById('mainVideoPlayer');
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const rewindBtn = document.getElementById('rewindBtn');
+            const forwardBtn = document.getElementById('forwardBtn');
+            const volumeBtn = document.getElementById('volumeBtn');
+            const volumeControl = document.getElementById('volumeControl');
+            const pipBtn = document.getElementById('pipBtn');
+            const progressBar = document.getElementById('progressBar');
+            const progressFilled = document.getElementById('progressFilled');
+            const progressThumb = document.getElementById('progressThumb');
+            const closePlayer = document.getElementById('closePlayer');
+            
+            // Video.js events
+            videoPlayer.on('play', () => {
+                playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
             });
+            
+            videoPlayer.on('pause', () => {
+                playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            });
+            
+            videoPlayer.on('timeupdate', () => {
+                updateProgress();
+            });
+            
+            videoPlayer.on('loadedmetadata', () => {
+                updateDuration();
+            });
+            
+            videoPlayer.on('volumechange', () => {
+                updateVolumeUI();
+            });
+            
+            // Play/Pause
+            playPauseBtn.addEventListener('click', () => {
+                if (videoPlayer.paused()) {
+                    videoPlayer.play();
+                } else {
+                    videoPlayer.pause();
+                }
+            });
+            
+            // Rewind 10 seconds
+            rewindBtn.addEventListener('click', () => {
+                videoPlayer.currentTime(Math.max(0, videoPlayer.currentTime() - 10));
+            });
+            
+            // Forward 10 seconds
+            forwardBtn.addEventListener('click', () => {
+                videoPlayer.currentTime(Math.min(videoPlayer.duration(), videoPlayer.currentTime() + 10));
+            });
+            
+            // Volume control
+            volumeControl.addEventListener('input', (e) => {
+                videoPlayer.volume(e.target.value / 100);
+            });
+            
+            // Close player
+            closePlayer.addEventListener('click', closeVideoPlayer);
+        }
+
+        // Helper functions
+        function formatDuration(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateProgress() {
+            if (!videoPlayer) return;
+            
+            const currentTime = videoPlayer.currentTime();
+            const duration = videoPlayer.duration();
+            
+            if (duration) {
+                const percent = (currentTime / duration) * 100;
+                document.getElementById('progressFilled').style.width = `${percent}%`;
+                document.getElementById('progressThumb').style.left = `${percent}%`;
+                
+                document.getElementById('currentTime').textContent = formatTime(currentTime);
+                document.getElementById('durationTime').textContent = formatTime(duration);
+            }
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateDuration() {
+            if (!videoPlayer) return;
+            
+            const duration = videoPlayer.duration();
+            if (duration) {
+                document.getElementById('durationTime').textContent = formatTime(duration);
+                document.getElementById('durationDisplay').textContent = formatTime(duration);
+            }
+        }
+
+        function updateVolumeUI() {
+            if (!videoPlayer) return;
+            
+            const volume = videoPlayer.volume();
+            document.getElementById('volumeControl').value = volume * 100;
+            
+            const volumeBtn = document.getElementById('volumeBtn');
+            if (volume === 0) {
+                volumeBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+            } else if (volume < 0.5) {
+                volumeBtn.innerHTML = '<i class="fas fa-volume-down"></i>';
+            } else {
+                volumeBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+            }
         }
 
         // Update stream info UI
@@ -1572,7 +2501,11 @@
             
             // Update quality badge
             const qualityText = document.getElementById('currentQualityText');
-            qualityText.textContent = currentQuality === 'auto' ? 'Auto' : currentQuality.toUpperCase();
+            if (currentQuality === 'auto' && streamData.auto_definition) {
+                qualityText.textContent = `Auto (${streamData.auto_definition})`;
+            } else {
+                qualityText.textContent = currentQuality === 'auto' ? 'Auto' : currentQuality.toUpperCase();
+            }
             
             // Update quality badge class
             const qualityBadge = document.getElementById('currentQualityBadge');
@@ -1597,8 +2530,39 @@
 
         // Show player error
         function showPlayerError(message) {
+            const videoContainer = document.getElementById('videoContainer');
+            const errorEl = document.createElement('div');
+            errorEl.className = 'video-error';
+            errorEl.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: white;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 50px; color: var(--primary-color); margin-bottom: 20px;"></i>
+                    <h3 style="margin-bottom: 15px;">Stream Error</h3>
+                    <p style="margin-bottom: 20px; color: var(--text-secondary);">${message}</p>
+                    <button onclick="retryVideoStream()" class="watch-btn" style="padding: 12px 30px;">
+                        <i class="fas fa-redo"></i> Try Again
+                    </button>
+                </div>
+            `;
+            
+            // Remove existing error
+            const existingError = videoContainer.querySelector('.video-error');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            videoContainer.appendChild(errorEl);
             hidePlayerLoading();
-            showNotification(message, 'error');
+        }
+
+        // Retry video stream
+        async function retryVideoStream() {
+            if (currentVideoId) {
+                const errorEl = document.querySelector('.video-error');
+                if (errorEl) errorEl.remove();
+                
+                showPlayerLoading('Retrying...');
+                await loadVideoStream(currentVideoId, currentQuality);
+            }
         }
 
         // Close video player
@@ -1611,162 +2575,141 @@
                 // Pause video
                 if (videoPlayer) {
                     videoPlayer.pause();
-                } else {
-                    const videoElement = document.getElementById('mainVideoPlayer');
-                    if (videoElement) videoElement.pause();
                 }
             }
         }
 
-        // Test Stream API
-        async function testStreamAPI() {
+        // Play episode
+        async function playEpisode(episodeNumber, vid = null, episodeInfo = {}) {
             try {
-                showCustomModal('Testing Stream API', `
-                    <div style="text-align: center;">
-                        <div class="loading" style="margin: 20px 0;">
-                            <i class="fas fa-spinner fa-spin" style="color: var(--primary-color); font-size: 30px;"></i>
-                        </div>
-                        <p>Menguji koneksi ke API stream...</p>
-                    </div>
-                `, false);
+                // If we have episode info with video ID, use it directly
+                if (vid) {
+                    await playVideoStream(vid, {
+                        title: `Episode ${episodeNumber}`,
+                        description: episodeInfo.title || 'No description available',
+                        episodeNumber: episodeNumber,
+                        seriesId: episodeInfo.series_id || currentDramaDetail?.video_data?.series_id_str
+                    });
+                    return;
+                }
                 
-                // Test with a known video ID
-                const testVideoId = '7583564321033030661';
-                const response = await fetch(`${API_URL_VALIDATE}/${testVideoId}`);
-                const data = await response.json();
-                
-                if (data.code === 0 && data.data.valid) {
-                    showCustomModal('API Stream Berfungsi', `
-                        <div style="text-align: center;">
-                            <div style="margin-bottom: 20px;">
-                                <i class="fas fa-check-circle" style="color: #4CAF50; font-size: 50px;"></i>
+                // Otherwise, try to find the video ID from current episodes
+                if (currentEpisodes && currentEpisodes.length > 0) {
+                    const episode = currentEpisodes.find(ep => 
+                        ep.vid_index == episodeNumber || ep.vid === vid
+                    );
+                    
+                    if (episode && episode.vid) {
+                        await playVideoStream(episode.vid, {
+                            title: `Episode ${episodeNumber}`,
+                            description: episode.title || 'No description available',
+                            episodeNumber: episodeNumber,
+                            seriesId: episode.series_id
+                        });
+                    } else {
+                        showCustomModal('Episode Tidak Ditemukan', `
+                            <div style="text-align: center;">
+                                <p>Episode ${episodeNumber} tidak ditemukan.</p>
+                                <button onclick="closeCustomModal()" class="watch-btn">
+                                    Tutup
+                                </button>
                             </div>
-                            <p style="margin-bottom: 10px; font-size: 18px;">
-                                API Stream berfungsi dengan baik!
+                        `, true);
+                    }
+                } else {
+                    // Fallback to simulation mode
+                    showCustomModal('Streaming Dimulai', `
+                        <div style="text-align: center;">
+                            <h3 style="margin-bottom: 20px; color: var(--primary-color);">
+                                <i class="fas fa-play-circle"></i> Memulai Streaming
+                            </h3>
+                            <p style="margin-bottom: 20px;">
+                                Episode <strong>${episodeNumber}</strong> akan segera dimulai...
                             </p>
-                            <p style="color: var(--text-secondary); margin-bottom: 20px;">
-                                Video ID: ${testVideoId}<br>
-                                Status: Valid
-                            </p>
-                            <div style="background-color: var(--light-bg); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                                <p style="font-size: 14px; color: var(--text-secondary);">
-                                    <i class="fas fa-lightbulb"></i> Coba gunakan video ID dari daftar episode untuk streaming langsung.
+                            <div style="background-color: var(--light-bg); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                                <p style="color: var(--text-secondary); font-style: italic;">
+                                    "Player video akan muncul di sini"
                                 </p>
                             </div>
-                            <button onclick="closeCustomModal()" class="watch-btn">
-                                <i class="fas fa-times"></i> Tutup
-                            </button>
+                            <p style="font-size: 14px; color: var(--text-secondary);">
+                                <i class="fas fa-info-circle"></i> Untuk streaming langsung, pastikan API stream tersedia.
+                            </p>
+                            <div style="margin-top: 30px;">
+                                <button onclick="testStreamAPI()" class="trailer-btn" style="margin-right: 10px;">
+                                    <i class="fas fa-video"></i> Test Stream API
+                                </button>
+                                <button onclick="closeCustomModal()" class="watch-btn">
+                                    <i class="fas fa-times"></i> Tutup
+                                </button>
+                            </div>
                         </div>
-                    `, true);
-                } else {
-                    throw new Error(data.message || 'API validation failed');
+                    `, false);
                 }
             } catch (error) {
-                showCustomModal('API Stream Error', `
-                    <div style="text-align: center;">
-                        <div style="margin-bottom: 20px;">
-                            <i class="fas fa-exclamation-triangle" style="color: #ff6b00; font-size: 50px;"></i>
-                        </div>
-                        <p style="margin-bottom: 10px; font-size: 18px;">
-                            Gagal mengakses API Stream
-                        </p>
-                        <p style="color: var(--text-secondary); margin-bottom: 20px;">
-                            Error: ${error.message}
-                        </p>
-                        <div style="background-color: var(--light-bg); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                            <p style="font-size: 14px; color: var(--text-secondary;">
-                                <i class="fas fa-lightbulb"></i> Pastikan endpoint API stream tersedia dan video ID valid.
-                            </p>
-                        </div>
-                        <button onclick="closeCustomModal()" class="watch-btn">
-                            <i class="fas fa-times"></i> Tutup
-                        </button>
-                    </div>
-                `, true);
+                console.error('Error playing episode:', error);
+                showModalError('Gagal memulai streaming: ' + error.message);
             }
         }
 
-        // Setup video player controls
-        function setupVideoPlayerControls() {
-            // Close player
-            document.getElementById('closePlayer').addEventListener('click', closeVideoPlayer);
+        // Show custom modal
+        function showCustomModal(title, content, showClose = true) {
+            const modal = document.getElementById('customModal');
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 500px;">
+                    <div class="modal-header">
+                        <h2>${title}</h2>
+                        ${showClose ? `<button class="close-modal" onclick="closeCustomModal()">
+                            <i class="fas fa-times"></i>
+                        </button>` : ''}
+                    </div>
+                    <div class="modal-body" style="padding: 30px;">
+                        ${content}
+                    </div>
+                </div>
+            `;
             
-            // Close modal when clicking outside
-            document.getElementById('videoPlayerModal').addEventListener('click', (e) => {
-                if (e.target.id === 'videoPlayerModal') {
-                    closeVideoPlayer();
-                }
-            });
-            
-            // Quality modal
-            document.getElementById('qualityBtn').addEventListener('click', () => {
-                document.getElementById('qualityModal').style.display = 'block';
-            });
-            
-            document.getElementById('applyQuality').addEventListener('click', () => {
-                const selected = document.querySelector('.quality-option.active');
-                if (selected) {
-                    const quality = selected.getAttribute('data-quality');
-                    currentQuality = quality;
-                    if (currentVideoId) {
-                        loadVideoStream(currentVideoId, quality);
-                    }
-                }
-                document.getElementById('qualityModal').style.display = 'none';
-            });
-            
-            document.getElementById('cancelQuality').addEventListener('click', () => {
-                document.getElementById('qualityModal').style.display = 'none';
-            });
-            
-            // Subtitle modal
-            document.getElementById('subtitleBtn').addEventListener('click', () => {
-                document.getElementById('subtitleModal').style.display = 'block';
-            });
-            
-            document.getElementById('applySubtitle').addEventListener('click', () => {
-                const selected = document.querySelector('.subtitle-option.active');
-                if (selected) {
-                    const subtitle = selected.getAttribute('data-subtitle');
-                    // In real implementation, you would load the subtitle track
-                    console.log('Subtitle changed to:', subtitle);
-                }
-                document.getElementById('subtitleModal').style.display = 'none';
-            });
-            
-            document.getElementById('cancelSubtitle').addEventListener('click', () => {
-                document.getElementById('subtitleModal').style.display = 'none';
-            });
-            
-            // Fullscreen
-            document.getElementById('fullscreenBtn').addEventListener('click', () => {
-                const modal = document.querySelector('.video-player-modal .modal-content');
-                if (!document.fullscreenElement) {
-                    if (modal.requestFullscreen) {
-                        modal.requestFullscreen();
-                    }
-                } else {
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    }
-                }
-            });
-            
-            // Episode navigation
-            document.getElementById('episodeListToggle').addEventListener('click', () => {
-                document.getElementById('episodeSidebar').classList.toggle('active');
-            });
-            
-            document.getElementById('closeSidebar').addEventListener('click', () => {
-                document.getElementById('episodeSidebar').classList.remove('active');
-            });
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
         }
 
-        // Event Listeners
+        function closeCustomModal() {
+            const modal = document.getElementById('customModal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function showLoadingModal() {
+            document.getElementById('loadingModal').style.display = 'block';
+        }
+
+        function hideLoadingModal() {
+            document.getElementById('loadingModal').style.display = 'none';
+        }
+
+        function showModalError(message) {
+            showCustomModal('Terjadi Kesalahan', `
+                <div style="text-align: center;">
+                    <div style="margin-bottom: 20px;">
+                        <i class="fas fa-exclamation-triangle" style="color: #ff6b00; font-size: 50px;"></i>
+                    </div>
+                    <p style="margin-bottom: 20px; font-size: 18px;">${message}</p>
+                    <button onclick="closeCustomModal()" class="watch-btn" style="padding: 12px 30px;">
+                        <i class="fas fa-times"></i> Tutup
+                    </button>
+                </div>
+            `, true);
+        }
+
+        // Add to global scope
+        window.playEpisode = playEpisode;
+        window.closeCustomModal = closeCustomModal;
+        window.retryVideoStream = retryVideoStream;
+
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize
             fetchAllData();
-            setupVideoPlayerControls();
             
             // Header scroll effect
             window.addEventListener('scroll', () => {
@@ -1777,128 +2720,11 @@
                 }
             });
             
-            // Close search results when clicking outside
-            document.addEventListener('click', closeSearchResults);
-            
-            // Close modals with Escape key
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    closeDramaModal();
-                    closeCustomModal();
-                    closeVideoPlayer();
-                    hideLoadingModal();
-                }
-            });
-        });
-
-        exploreBtn.addEventListener('click', () => scrollToSection('trending'));
-
-        // Search functionality
-        searchBtn.addEventListener('click', () => {
-            const query = searchInput.value.trim();
-            if (query) {
-                searchDramas(query);
+            // Initialize video player when video.js loads
+            if (typeof videojs !== 'undefined') {
+                initializeVideoPlayer();
             }
         });
-
-        searchInput.addEventListener('input', () => {
-            const query = searchInput.value.trim();
-            
-            // Clear previous timeout
-            if (searchTimeout) {
-                clearTimeout(searchTimeout);
-            }
-            
-            // Hide search results if query is empty
-            if (!query) {
-                searchResults.classList.remove('active');
-                return;
-            }
-            
-            // Debounce search
-            searchTimeout = setTimeout(() => {
-                if (query.length >= 2) {
-                    searchDramas(query);
-                }
-            }, 500);
-        });
-
-        searchInput.addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') {
-                const query = searchInput.value.trim();
-                if (query) {
-                    searchDramas(query);
-                }
-            }
-        });
-
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                filterBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                const filter = btn.getAttribute('data-filter');
-                filterDramas(filter);
-            });
-        });
-
-        closeModal.addEventListener('click', closeDramaModal);
-        dramaModal.addEventListener('click', (e) => {
-            if (e.target === dramaModal) {
-                closeDramaModal();
-            }
-        });
-
-        // Mobile menu toggle
-        mobileMenuBtn.addEventListener('click', () => {
-            mainNav.classList.toggle('active');
-            mobileMenuBtn.innerHTML = mainNav.classList.contains('active') 
-                ? '<i class="fas fa-times"></i>' 
-                : '<i class="fas fa-bars"></i>';
-        });
-
-        // Navigation links
-        navLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                const sectionId = this.getAttribute('data-section');
-                if (sectionId) {
-                    scrollToSection(sectionId);
-                    
-                    // Close mobile menu if open
-                    if (mainNav.classList.contains('active')) {
-                        mainNav.classList.remove('active');
-                        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
-                    }
-                }
-            });
-        });
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!mainNav.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-                mainNav.classList.remove('active');
-                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
-            }
-        });
-
-        // Test player button
-        testPlayerBtn.addEventListener('click', () => {
-            const testVideoId = '7583564321033030661';
-            playVideoStream(testVideoId, {
-                title: 'Test Video Stream',
-                description: 'This is a test video stream demonstration',
-                episodeNumber: 1,
-                seriesId: 'test-series'
-            });
-        });
-
-        // Make functions available globally
-        window.closeCustomModal = closeCustomModal;
-        window.testStreamAPI = testStreamAPI;
-        window.playEpisodeFromList = playEpisodeFromList;
-        window.closeVideoPlayer = closeVideoPlayer;
     </script>
 </body>
 </html>
