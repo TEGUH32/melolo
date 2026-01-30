@@ -6,27 +6,87 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "build": "npm install && npm run build-css",
-    "build-css": "postcss public/css/style.css -o public/css/style.min.css"
+    "prod": "NODE_ENV=production node server.js",
+    "build": "npm install && npm run build:css",
+    "build:css": "postcss public/css/style.css -o public/css/style.min.css",
+    "build:js": "terser public/js/app.js -o public/js/app.min.js -c -m",
+    "build:all": "npm run build:css && npm run build:js",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{js,json,css,md}\"",
+    "docker:build": "docker build -t dramachina-app .",
+    "docker:run": "docker run -p 3000:3000 dramachina-app",
+    "docker:compose": "docker-compose up",
+    "pm2:start": "pm2 start pm2.config.js",
+    "pm2:stop": "pm2 stop dramachina-app",
+    "pm2:restart": "pm2 restart dramachina-app",
+    "pm2:logs": "pm2 logs dramachina-app",
+    "pm2:monitor": "pm2 monit"
   },
   "dependencies": {
     "express": "^4.18.2",
     "axios": "^1.6.2",
     "ejs": "^3.1.9",
     "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "morgan": "^1.10.0",
     "helmet": "^7.0.0",
     "compression": "^1.7.4",
+    "morgan": "^1.10.0",
+    "dotenv": "^16.3.1",
+    "cookie-parser": "^1.4.6",
+    "express-session": "^1.17.3",
+    "express-rate-limit": "^7.1.5",
+    "express-mongo-sanitize": "^2.2.0",
+    "xss-clean": "^0.1.4",
+    "hpp": "^0.2.3",
+    "connect-redis": "^7.1.0",
+    "redis": "^4.6.10",
     "video.js": "^7.20.3",
     "videojs-contrib-quality-levels": "^3.0.0",
-    "videojs-http-source-selector": "^1.1.6"
+    "videojs-http-source-selector": "^1.1.6",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "validator": "^13.11.0",
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0",
+    "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.1",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "eslint": "^8.54.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.29.0",
+    "prettier": "^3.1.0",
+    "terser": "^5.24.0",
     "postcss": "^8.4.31",
     "postcss-cli": "^10.1.0",
     "autoprefixer": "^10.4.16",
     "cssnano": "^6.0.1"
-  }
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "drama",
+    "china",
+    "streaming",
+    "video",
+    "player",
+    "subtitle",
+    "indonesia"
+  ],
+  "author": "DramaChina Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dramachina/dramachina-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dramachina/dramachina-app/issues"
+  },
+  "homepage": "https://dramachina.com"
 }
