@@ -1,0 +1,1904 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Video.js CSS -->
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
+    
+    <!-- Meta Tags -->
+    <meta name="description" content="Streaming drama China terlengkap dengan subtitle Bahasa Indonesia. Nikmati berbagai drama trending dan terbaru dengan kualitas terbaik.">
+    <meta name="keywords" content="drama china, streaming drama, chinese drama, film china, subtitle indonesia">
+    <meta name="author" content="DramaChina">
+    <meta property="og:title" content="<%= title %>">
+    <meta property="og:description" content="Streaming drama China terlengkap dengan subtitle Bahasa Indonesia">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://dramachina.com">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1574269909862-7e1d70bb8078">
+    
+    <style>
+        /* Additional styles for better UI */
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 9999;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .player-test-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            z-index: 999;
+            box-shadow: 0 5px 15px rgba(229, 9, 20, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+        
+        .player-test-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(229, 9, 20, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification Area -->
+    <div id="notification" class="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText">Notification</span>
+    </div>
+    
+    <!-- Header -->
+    <header id="mainHeader">
+        <div class="logo">
+            <i class="fas fa-play-circle"></i>
+            <h1>DramaChina</h1>
+        </div>
+        
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <nav id="mainNav">
+            <ul>
+                <li><a href="#" class="active" data-section="hero">Beranda</a></li>
+                <li><a href="#" data-section="trending">Trending</a></li>
+                <li><a href="#" data-section="latest">Terbaru</a></li>
+                <li><a href="#" data-section="popular">Populer</a></li>
+                <li><a href="#" data-section="about">Tentang</a></li>
+            </ul>
+        </nav>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Cari drama...">
+            <button id="searchBtn"><i class="fas fa-search"></i></button>
+            
+            <!-- Search Results Dropdown -->
+            <div class="search-results" id="searchResults">
+                <!-- Search results will be loaded here -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <h2>Streaming Drama China Terlengkap</h2>
+            <p>Nikmati berbagai drama China trending dan terbaru dengan subtitle Bahasa Indonesia. Streaming tanpa iklan dengan kualitas terbaik.</p>
+            <button class="cta-button" id="exploreBtn">
+                <i class="fas fa-play-circle"></i> Mulai Menonton
+            </button>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Search Results Section -->
+        <div class="search-results-section" id="searchResultsSection">
+            <h2 class="section-title search-results-title" id="searchResultsTitle">
+                <i class="fas fa-search"></i> Hasil Pencarian
+            </h2>
+            <div class="drama-grid" id="searchResultsGrid">
+                <!-- Search results will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Trending Section -->
+        <h2 class="section-title trending" id="trending">
+            <i class="fas fa-fire"></i> Drama Trending
+        </h2>
+        
+        <div class="drama-grid" id="trendingGrid">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Memuat drama trending...</p>
+            </div>
+        </div>
+
+        <!-- Latest Section -->
+        <h2 class="section-title" id="latest">
+            <i class="fas fa-star"></i> Drama Terbaru
+        </h2>
+        
+        <div class="filter-container">
+            <button class="filter-btn active" data-filter="all">
+                <i class="fas fa-th-large"></i> Semua
+            </button>
+            <button class="filter-btn" data-filter="romance">
+                <i class="fas fa-heart"></i> Romantis
+            </button>
+            <button class="filter-btn" data-filter="drama">
+                <i class="fas fa-theater-masks"></i> Drama
+            </button>
+            <button class="filter-btn" data-filter="fantasy">
+                <i class="fas fa-hat-wizard"></i> Fantasi
+            </button>
+            <button class="filter-btn" data-filter="hot">
+                <i class="fas fa-fire"></i> Hot
+            </button>
+        </div>
+        
+        <div class="drama-grid" id="latestGrid">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Memuat drama terbaru...</p>
+            </div>
+        </div>
+        
+        <!-- Popular Section -->
+        <h2 class="section-title" id="popular">
+            <i class="fas fa-chart-line"></i> Drama Populer
+        </h2>
+        <div class="drama-grid" id="popularGrid">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Memuat drama populer...</p>
+            </div>
+        </div>
+        
+        <!-- Test Player Button -->
+        <button class="player-test-btn" id="testPlayerBtn">
+            <i class="fas fa-video"></i> Test Video Player
+        </button>
+    </main>
+
+    <!-- Drama Detail Modal -->
+    <div class="drama-modal" id="dramaModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Judul Drama</h2>
+                <button class="close-modal" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-poster">
+                    <img id="modalPoster" src="" alt="Drama Poster" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80';">
+                </div>
+                <div class="modal-info">
+                    <h3 id="modalName">Judul Drama</h3>
+                    <p id="modalDescription">Deskripsi drama akan muncul di sini.</p>
+                    
+                    <div class="modal-details">
+                        <ul id="modalDetails">
+                            <!-- Details will be added here -->
+                        </ul>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button class="play-btn" id="playBtn">
+                            <i class="fas fa-play"></i> Tonton Sekarang
+                        </button>
+                        <button class="trailer-btn" id="trailerBtn">
+                            <i class="fas fa-film"></i> Lihat Trailer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Player Modal -->
+    <div class="drama-modal video-player-modal" id="videoPlayerModal">
+        <div class="modal-content" style="max-width: 1000px; background-color: #000;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #000, #333);">
+                <h2 id="playerTitle" style="color: white;">Video Player</h2>
+                <div class="player-controls-top">
+                    <button class="player-btn" id="qualityBtn" title="Quality">
+                        <i class="fas fa-cog"></i> Quality
+                    </button>
+                    <button class="player-btn" id="subtitleBtn" title="Subtitles">
+                        <i class="fas fa-closed-captioning"></i> Subtitles
+                    </button>
+                    <button class="player-btn" id="fullscreenBtn" title="Fullscreen">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                    <button class="close-modal" id="closePlayer">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body" style="padding: 0; position: relative;">
+                <!-- Video Container -->
+                <div class="video-container" id="videoContainer">
+                    <div class="video-loading" id="videoLoading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading video stream...</p>
+                    </div>
+                    
+                    <!-- Video Element -->
+                    <video id="mainVideoPlayer" class="video-js vjs-default-skin vjs-big-play-centered" 
+                           controls preload="auto" playsinline>
+                        <p class="vjs-no-js">
+                            To view this video please enable JavaScript, and consider upgrading to a
+                            web browser that <a href="https://videojs.com/html5-video-support/" target="_blank">
+                            supports HTML5 video</a>
+                        </p>
+                    </video>
+                    
+                    <!-- Custom Controls -->
+                    <div class="custom-controls" id="customControls">
+                        <div class="progress-container">
+                            <div class="progress-bar" id="progressBar">
+                                <div class="progress-filled" id="progressFilled"></div>
+                                <div class="progress-thumb" id="progressThumb"></div>
+                            </div>
+                            <div class="time-display">
+                                <span id="currentTime">0:00</span> / <span id="durationTime">0:00</span>
+                            </div>
+                        </div>
+                        
+                        <div class="control-buttons">
+                            <button class="control-btn" id="playPauseBtn">
+                                <i class="fas fa-play"></i>
+                            </button>
+                            <button class="control-btn" id="rewindBtn">
+                                <i class="fas fa-backward"></i> 10s
+                            </button>
+                            <button class="control-btn" id="forwardBtn">
+                                <i class="fas fa-forward"></i> 10s
+                            </button>
+                            <button class="control-btn" id="volumeBtn">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                            <div class="volume-slider" id="volumeSlider">
+                                <input type="range" min="0" max="100" value="100" id="volumeControl">
+                            </div>
+                            <button class="control-btn" id="pipBtn" title="Picture-in-Picture">
+                                <i class="fas fa-picture-in-picture"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Video Info Panel -->
+                <div class="video-info-panel" id="videoInfoPanel">
+                    <div class="video-info-header">
+                        <h3 id="videoEpisodeTitle">Episode 1</h3>
+                        <div class="video-stats">
+                            <span><i class="fas fa-eye"></i> <span id="viewCount">0</span> views</span>
+                            <span><i class="fas fa-heart"></i> <span id="likeCount">0</span> likes</span>
+                            <span><i class="fas fa-clock"></i> <span id="durationDisplay">0:00</span></span>
+                        </div>
+                    </div>
+                    
+                    <div class="video-description" id="videoDescription">
+                        Loading video description...
+                    </div>
+                    
+                    <div class="video-quality-info">
+                        <div class="quality-badge" id="currentQualityBadge">
+                            <i class="fas fa-hd"></i> <span id="currentQualityText">Auto</span>
+                        </div>
+                        <div class="resolution-info">
+                            <i class="fas fa-expand-arrows-alt"></i> 
+                            <span id="resolutionInfo">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quality Selection Modal -->
+                <div class="quality-modal" id="qualityModal">
+                    <div class="quality-modal-content">
+                        <h3><i class="fas fa-cog"></i> Select Quality</h3>
+                        <div class="quality-options" id="qualityOptions">
+                            <div class="quality-option active" data-quality="auto">
+                                <i class="fas fa-magic"></i>
+                                <span>Auto (Recommended)</span>
+                                <span class="quality-desc">Best for your connection</span>
+                            </div>
+                        </div>
+                        <div class="quality-actions">
+                            <button class="quality-btn" id="applyQuality">Apply</button>
+                            <button class="quality-btn cancel" id="cancelQuality">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Subtitle Selection Modal -->
+                <div class="subtitle-modal" id="subtitleModal">
+                    <div class="subtitle-modal-content">
+                        <h3><i class="fas fa-closed-captioning"></i> Subtitles</h3>
+                        <div class="subtitle-options" id="subtitleOptions">
+                            <div class="subtitle-option active" data-subtitle="none">
+                                <i class="fas fa-ban"></i>
+                                <span>None</span>
+                            </div>
+                            <div class="subtitle-option" data-subtitle="id">
+                                <i class="fas fa-flag"></i>
+                                <span>Bahasa Indonesia</span>
+                            </div>
+                            <div class="subtitle-option" data-subtitle="en">
+                                <i class="fas fa-flag-usa"></i>
+                                <span>English</span>
+                            </div>
+                        </div>
+                        <div class="subtitle-actions">
+                            <button class="subtitle-btn" id="applySubtitle">Apply</button>
+                            <button class="subtitle-btn cancel" id="cancelSubtitle">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Episode Navigation -->
+            <div class="episode-navigation" id="episodeNavigation">
+                <button class="episode-nav-btn prev" id="prevEpisode">
+                    <i class="fas fa-chevron-left"></i> Previous Episode
+                </button>
+                <div class="episode-list-toggle" id="episodeListToggle">
+                    <i class="fas fa-list"></i> Episode List
+                </div>
+                <button class="episode-nav-btn next" id="nextEpisode">
+                    Next Episode <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <!-- Episode List Sidebar -->
+            <div class="episode-sidebar" id="episodeSidebar">
+                <div class="episode-sidebar-header">
+                    <h3><i class="fas fa-film"></i> Episodes</h3>
+                    <button class="close-sidebar" id="closeSidebar">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="episode-list" id="episodeList">
+                    <!-- Episode list will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div class="drama-modal" id="loadingModal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-body" style="text-align: center; padding: 50px 30px;">
+                <i class="fas fa-spinner fa-spin" style="color: var(--primary-color); font-size: 50px; margin-bottom: 20px;"></i>
+                <h3 style="color: white; margin-bottom: 15px;">Memuat Detail Drama</h3>
+                <p style="color: var(--text-secondary);">Harap tunggu sebentar...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Modal -->
+    <div class="drama-modal" id="customModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 id="customModalTitle">Modal Title</h2>
+                <button class="close-modal" onclick="closeCustomModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 30px;" id="customModalContent">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer id="about">
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>DramaChina</h3>
+                <p>Situs streaming drama China terlengkap dengan kualitas terbaik dan subtitle Bahasa Indonesia.</p>
+                <div style="margin-top: 15px; display: flex; gap: 15px;">
+                    <a href="#" style="color: var(--primary-color); font-size: 20px;">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="#" style="color: var(--primary-color); font-size: 20px;">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" style="color: var(--primary-color); font-size: 20px;">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" style="color: var(--primary-color); font-size: 20px;">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Kategori</h3>
+                <ul>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Drama Romantis</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Drama Fantasi</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Drama Sejarah</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Drama Modern</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Drama Keluarga</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Menu</h3>
+                <ul>
+                    <li><a href="#" data-section="hero"><i class="fas fa-chevron-right"></i> Beranda</a></li>
+                    <li><a href="#" data-section="trending"><i class="fas fa-chevron-right"></i> Trending</a></li>
+                    <li><a href="#" data-section="latest"><i class="fas fa-chevron-right"></i> Terbaru</a></li>
+                    <li><a href="#" data-section="popular"><i class="fas fa-chevron-right"></i> Populer</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Kontak</h3>
+                <ul>
+                    <li><a href="#"><i class="fas fa-envelope"></i> support@dramachina.com</a></li>
+                    <li><a href="#"><i class="fas fa-phone"></i> +62 812 3456 7890</a></li>
+                    <li><a href="#"><i class="fas fa-map-marker-alt"></i> Jakarta, Indonesia</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; <%= new Date().getFullYear() %> DramaChina. Semua hak dilindungi undang-undang. | Streaming drama China legal dan berlisensi.</p>
+        </div>
+    </footer>
+
+    <!-- Video.js Script -->
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+    
+    <!-- Main Application Script -->
+    <script>
+        // API URLs
+        const API_BASE = '/api';
+        const API_URL_LATEST = `${API_BASE}/latest`;
+        const API_URL_TRENDING = `${API_BASE}/trending`;
+        const API_URL_SEARCH = `${API_BASE}/search?query=`;
+        const API_URL_DETAIL = `${API_BASE}/detail`;
+        const API_URL_EPISODES = `${API_BASE}/episodes`;
+        const API_URL_METADATA = `${API_BASE}/metadata`;
+        const API_URL_SIMILAR = `${API_BASE}/similar`;
+        const API_URL_STREAM = `${API_BASE}/stream`;
+        const API_URL_STREAM_QUALITY = `${API_BASE}/stream-quality`;
+        const API_URL_PLAYBACK = `${API_BASE}/playback`;
+        const API_URL_VALIDATE = `${API_BASE}/validate`;
+        const API_URL_SUBTITLES = `${API_BASE}/subtitles`;
+
+        // DOM Elements
+        const mainHeader = document.getElementById('mainHeader');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mainNav = document.getElementById('mainNav');
+        const trendingGrid = document.getElementById('trendingGrid');
+        const latestGrid = document.getElementById('latestGrid');
+        const popularGrid = document.getElementById('popularGrid');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const searchResults = document.getElementById('searchResults');
+        const searchResultsSection = document.getElementById('searchResultsSection');
+        const searchResultsTitle = document.getElementById('searchResultsTitle');
+        const searchResultsGrid = document.getElementById('searchResultsGrid');
+        const exploreBtn = document.getElementById('exploreBtn');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const dramaModal = document.getElementById('dramaModal');
+        const closeModal = document.getElementById('closeModal');
+        const playBtn = document.getElementById('playBtn');
+        const trailerBtn = document.getElementById('trailerBtn');
+        const navLinks = document.querySelectorAll('nav a, .footer-column a[data-section]');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        const testPlayerBtn = document.getElementById('testPlayerBtn');
+
+        // Global variables
+        let latestDramas = [];
+        let trendingDramas = [];
+        let filteredDramas = [];
+        let searchDramas = [];
+        let currentDrama = null;
+        let currentDramaDetail = null;
+        let currentEpisodes = [];
+        let searchTimeout = null;
+        let videoPlayer = null;
+        let currentStreamData = null;
+        let currentVideoId = null;
+        let currentQuality = 'auto';
+        let playerInitialized = false;
+        let playbackHistory = [];
+
+        // Utility Functions
+        function showNotification(message, type = 'success', duration = 3000) {
+            notificationText.textContent = message;
+            notification.style.display = 'block';
+            
+            if (type === 'error') {
+                notification.style.background = 'linear-gradient(45deg, #ff6b00, #ff8c00)';
+            } else if (type === 'warning') {
+                notification.style.background = 'linear-gradient(45deg, #ffcc00, #ff9900)';
+            } else {
+                notification.style.background = 'linear-gradient(45deg, var(--primary-color), var(--secondary-color))';
+            }
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, duration);
+        }
+
+        function formatDuration(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Fetch data from APIs
+        async function fetchAllData() {
+            try {
+                showNotification('Memuat data drama...', 'info');
+                
+                // Fetch trending dramas
+                const trendingResponse = await fetch(API_URL_TRENDING);
+                const trendingData = await trendingResponse.json();
+                
+                if (trendingData && trendingData.books) {
+                    trendingDramas = trendingData.books;
+                    displayTrendingDramas();
+                }
+                
+                // Fetch latest dramas
+                const latestResponse = await fetch(API_URL_LATEST);
+                const latestData = await latestResponse.json();
+                
+                if (latestData && latestData.books) {
+                    latestDramas = latestData.books;
+                    filteredDramas = [...latestDramas];
+                    displayLatestDramas();
+                    displayPopularDramas();
+                    
+                    showNotification('Data drama berhasil dimuat!', 'success');
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                showNotification('Gagal memuat data. Silakan coba lagi nanti.', 'error');
+                showError('Gagal memuat data. Silakan coba lagi nanti.');
+            }
+        }
+
+        // Display trending dramas
+        function displayTrendingDramas() {
+            if (trendingDramas.length === 0) {
+                trendingGrid.innerHTML = `
+                    <div class="loading">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Tidak ada drama trending saat ini.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            trendingGrid.innerHTML = '';
+            
+            trendingDramas.forEach(drama => {
+                const dramaCard = createDramaCard(drama, true, false);
+                trendingGrid.appendChild(dramaCard);
+            });
+        }
+
+        // Display latest dramas
+        function displayLatestDramas() {
+            if (filteredDramas.length === 0) {
+                latestGrid.innerHTML = `
+                    <div class="loading">
+                        <i class="fas fa-search"></i>
+                        <p>Tidak ada drama yang ditemukan.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            latestGrid.innerHTML = '';
+            
+            filteredDramas.forEach(drama => {
+                const dramaCard = createDramaCard(drama, false, false);
+                latestGrid.appendChild(dramaCard);
+            });
+        }
+
+        // Display popular dramas
+        function displayPopularDramas() {
+            const popularDramas = latestDramas.filter(drama => drama.is_hot === "1");
+            
+            if (popularDramas.length === 0) {
+                popularGrid.innerHTML = `
+                    <div class="loading">
+                        <i class="fas fa-fire"></i>
+                        <p>Tidak ada drama populer saat ini.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            popularGrid.innerHTML = '';
+            
+            popularDramas.slice(0, 6).forEach(drama => {
+                const dramaCard = createDramaCard(drama, false, false);
+                popularGrid.appendChild(dramaCard);
+            });
+        }
+
+        // Create drama card element
+        function createDramaCard(drama, isTrending = false, isSearchResult = false) {
+            const dramaCard = document.createElement('div');
+            let cardClass = 'drama-card';
+            let badgeClass = '';
+            let btnClass = 'watch-btn';
+            
+            if (isTrending) {
+                cardClass += ' trending';
+                badgeClass = 'trending-badge';
+                btnClass += ' trending';
+            } else if (isSearchResult) {
+                cardClass += ' search-result';
+                badgeClass = 'search-badge';
+                btnClass += ' search-result';
+            }
+            
+            dramaCard.className = cardClass;
+            dramaCard.setAttribute('data-category', getDramaCategory(drama));
+            
+            // Extract categories from stat_infos
+            const categories = drama.stat_infos ? drama.stat_infos.join(', ') : 'Drama';
+            const episodeCount = drama.serial_count || '0';
+            const author = drama.author || 'Tidak diketahui';
+            
+            dramaCard.innerHTML = `
+                <div class="card-image">
+                    <img src="${drama.thumb_url}" alt="${drama.book_name}" 
+                         onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80';">
+                    <div class="age-badge">${drama.age_gate || '18'}+</div>
+                    ${isTrending ? `
+                        <div class="trending-badge">
+                            <i class="fas fa-fire"></i> Trending
+                        </div>
+                    ` : ''}
+                    ${isSearchResult ? `
+                        <div class="search-badge">
+                            <i class="fas fa-search"></i> Hasil Pencarian
+                        </div>
+                    ` : ''}
+                </div>
+                <div class="drama-info">
+                    <h3>${drama.book_name}</h3>
+                    <p>${drama.abstract ? drama.abstract.substring(0, 120) + '...' : 'Tidak ada deskripsi.'}</p>
+                    <div class="drama-meta">
+                        <span><i class="fas fa-user"></i> ${author}</span>
+                        <span><i class="fas fa-list"></i> ${episodeCount} Episode</span>
+                    </div>
+                    <button class="${btnClass}" data-id="${drama.book_id}">
+                        <i class="fas fa-play"></i> Tonton
+                    </button>
+                </div>
+            `;
+            
+            // Add click events
+            const watchBtn = dramaCard.querySelector('.watch-btn');
+            watchBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openDramaModal(drama);
+            });
+            
+            dramaCard.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('watch-btn')) {
+                    openDramaModal(drama);
+                }
+            });
+            
+            return dramaCard;
+        }
+
+        // Get drama category for filtering
+        function getDramaCategory(drama) {
+            if (drama.stat_infos && drama.stat_infos.join(' ').toLowerCase().includes('romans')) {
+                return 'romance';
+            } else if (drama.stat_infos && drama.stat_infos.join(' ').toLowerCase().includes('fantas')) {
+                return 'fantasy';
+            } else if (drama.is_hot === "1") {
+                return 'hot';
+            } else {
+                return 'drama';
+            }
+        }
+
+        // Search dramas
+        async function searchDramas(query) {
+            if (!query || query.trim().length < 2) {
+                searchResults.classList.remove('active');
+                return;
+            }
+            
+            try {
+                searchResults.innerHTML = `
+                    <div class="loading" style="padding: 20px;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Mencari drama...</p>
+                    </div>
+                `;
+                searchResults.classList.add('active');
+                
+                const encodedQuery = encodeURIComponent(query.trim());
+                const searchResponse = await fetch(`${API_URL_SEARCH}${encodedQuery}&limit=10&offset=0`);
+                const searchData = await searchResponse.json();
+                
+                if (searchData && searchData.code === 0 && searchData.data && searchData.data.search_data) {
+                    searchDramas = [];
+                    searchData.data.search_data.forEach(item => {
+                        if (item.books && item.books.length > 0) {
+                            searchDramas.push(...item.books);
+                        }
+                    });
+                    
+                    displaySearchResults(searchDramas, query);
+                } else {
+                    showNoSearchResults(query);
+                }
+            } catch (error) {
+                console.error('Error searching:', error);
+                searchResults.innerHTML = `
+                    <div class="loading" style="padding: 20px;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Gagal melakukan pencarian.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Display search results in dropdown
+        function displaySearchResults(dramas, query) {
+            if (dramas.length === 0) {
+                showNoSearchResults(query);
+                return;
+            }
+            
+            searchResults.innerHTML = '';
+            
+            // Show top 5 results in dropdown
+            const topResults = dramas.slice(0, 5);
+            
+            topResults.forEach(drama => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'search-result-item';
+                resultItem.innerHTML = `
+                    <img src="${drama.thumb_url}" alt="${drama.book_name}" 
+                         onerror="this.src='https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80'">
+                    <div class="search-result-info">
+                        <h4>${highlightText(drama.book_name, query)}</h4>
+                        <p>${drama.abstract ? drama.abstract.substring(0, 80) + '...' : 'Tidak ada deskripsi.'}</p>
+                    </div>
+                `;
+                
+                resultItem.addEventListener('click', () => {
+                    openDramaModal(drama);
+                    searchResults.classList.remove('active');
+                    searchInput.value = '';
+                });
+                
+                searchResults.appendChild(resultItem);
+            });
+            
+            // Add "View All Results" button if there are more results
+            if (dramas.length > 5) {
+                const viewAllBtn = document.createElement('div');
+                viewAllBtn.className = 'view-all-results';
+                viewAllBtn.textContent = `Lihat semua ${dramas.length} hasil`;
+                viewAllBtn.addEventListener('click', () => {
+                    showFullSearchResults(dramas, query);
+                    searchResults.classList.remove('active');
+                });
+                searchResults.appendChild(viewAllBtn);
+            }
+        }
+
+        // Show full search results in main section
+        function showFullSearchResults(dramas, query) {
+            // Hide other sections
+            document.querySelectorAll('.section-title').forEach(title => {
+                if (!title.id.includes('searchResults')) {
+                    title.style.display = 'none';
+                }
+            });
+            
+            document.querySelectorAll('.drama-grid').forEach(grid => {
+                if (!grid.id.includes('searchResults')) {
+                    grid.style.display = 'none';
+                }
+            });
+            
+            document.querySelector('.filter-container').style.display = 'none';
+            
+            // Show search results section
+            searchResultsSection.classList.add('active');
+            searchResultsTitle.innerHTML = `<i class="fas fa-search"></i> Hasil Pencarian: "${query}"`;
+            
+            if (dramas.length === 0) {
+                searchResultsGrid.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <h3>Tidak ada hasil untuk "${query}"</h3>
+                        <p>Coba gunakan kata kunci yang berbeda atau periksa ejaan.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            searchResultsGrid.innerHTML = '';
+            
+            dramas.forEach(drama => {
+                const dramaCard = createDramaCard(drama, false, true);
+                searchResultsGrid.appendChild(dramaCard);
+            });
+            
+            // Scroll to search results
+            searchResultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Highlight text in search results
+        function highlightText(text, query) {
+            if (!text || !query) return text;
+            
+            const lowerText = text.toLowerCase();
+            const lowerQuery = query.toLowerCase();
+            const index = lowerText.indexOf(lowerQuery);
+            
+            if (index === -1) return text;
+            
+            const before = text.substring(0, index);
+            const match = text.substring(index, index + query.length);
+            const after = text.substring(index + query.length);
+            
+            return `${before}<span style="color: var(--search-color); font-weight: bold;">${match}</span>${after}`;
+        }
+
+        // Show no search results
+        function showNoSearchResults(query) {
+            searchResults.innerHTML = `
+                <div class="search-result-item" style="text-align: center; padding: 30px 20px;">
+                    <i class="fas fa-search" style="font-size: 24px; color: var(--text-secondary); margin-bottom: 10px;"></i>
+                    <p style="color: var(--text-secondary);">Tidak ada hasil untuk "${query}"</p>
+                </div>
+            `;
+        }
+
+        // Open drama modal
+        async function openDramaModal(drama) {
+            currentDrama = drama;
+            
+            // Show basic info immediately
+            showBasicDramaInfo(drama);
+            
+            // Fetch detailed info
+            try {
+                showLoadingModal();
+                
+                const [detailResponse, episodesResponse] = await Promise.all([
+                    fetch(`${API_URL_DETAIL}/${drama.book_id}`),
+                    fetch(`${API_URL_EPISODES}/${drama.book_id}?limit=10`)
+                ]);
+                
+                const detailData = await detailResponse.json();
+                const episodesData = await episodesResponse.json();
+                
+                if (detailData.code === 0 && detailData.data) {
+                    currentDramaDetail = detailData.data;
+                    currentEpisodes = episodesData.data?.episodes || [];
+                    displayDramaDetail(detailData.data);
+                } else {
+                    throw new Error('Failed to fetch drama details');
+                }
+                
+                hideLoadingModal();
+            } catch (error) {
+                console.error('Error fetching drama detail:', error);
+                hideLoadingModal();
+                displayBasicDramaInfo(drama);
+                showNotification('Gagal memuat detail lengkap, menampilkan info dasar.', 'warning');
+            }
+        }
+
+        // Show basic drama info while loading
+        function showBasicDramaInfo(drama) {
+            document.getElementById('modalTitle').textContent = drama.book_name;
+            document.getElementById('modalName').textContent = drama.book_name;
+            document.getElementById('modalDescription').textContent = 
+                drama.abstract ? drama.abstract.substring(0, 200) + '...' : 'Tidak ada deskripsi.';
+            
+            const modalPoster = document.getElementById('modalPoster');
+            modalPoster.src = drama.thumb_url || '';
+            modalPoster.alt = drama.book_name;
+            modalPoster.onerror = function() {
+                this.onerror = null;
+                this.src = 'https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80';
+            };
+            
+            const detailsList = document.getElementById('modalDetails');
+            const episodeCount = drama.serial_count || '0';
+            const author = drama.author || 'Tidak diketahui';
+            
+            detailsList.innerHTML = `
+                <li><i class="fas fa-user-edit"></i> <strong>Penulis:</strong> ${author}</li>
+                <li><i class="fas fa-list-ol"></i> <strong>Episode:</strong> ${episodeCount}</li>
+                <li><i class="fas fa-spinner fa-spin"></i> <strong>Status:</strong> Memuat detail...</li>
+            `;
+            
+            playBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memuat...`;
+            playBtn.disabled = true;
+            trailerBtn.disabled = true;
+            
+            // Show modal
+            dramaModal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Display drama detail
+        function displayDramaDetail(detailData) {
+            const videoData = detailData.video_data;
+            
+            if (!videoData) {
+                showModalError('Data drama tidak tersedia.');
+                return;
+            }
+            
+            // Update modal details
+            const detailsList = document.getElementById('modalDetails');
+            
+            // Parse categories
+            let categories = 'Tidak ada kategori';
+            try {
+                if (videoData.category_schema) {
+                    const parsedCategories = JSON.parse(videoData.category_schema);
+                    categories = parsedCategories.map(cat => cat.name).join(', ');
+                }
+            } catch (e) {
+                console.error('Error parsing categories:', e);
+            }
+            
+            const totalEpisodes = videoData.episode_cnt || '0';
+            const followerCount = videoData.followed_cnt ? videoData.followed_cnt.toLocaleString() : '0';
+            const playCount = videoData.series_play_cnt ? videoData.series_play_cnt.toLocaleString() : '0';
+            const ageRating = videoData.age_gate_info?.age_gate || '18';
+            const status = videoData.series_status === 1 ? 'Sedang Tayang' : 'Selesai';
+            
+            detailsList.innerHTML = `
+                <li><i class="fas fa-tags"></i> <strong>Kategori:</strong> ${categories}</li>
+                <li><i class="fas fa-list-ol"></i> <strong>Total Episode:</strong> ${totalEpisodes}</li>
+                <li><i class="fas fa-users"></i> <strong>Pengikut:</strong> ${followerCount}</li>
+                <li><i class="fas fa-play-circle"></i> <strong>Ditonton:</strong> ${playCount} kali</li>
+                <li><i class="fas fa-user-shield"></i> <strong>Rating Usia:</strong> ${ageRating}+</li>
+                <li><i class="fas fa-check-circle"></i> <strong>Status:</strong> ${status}</li>
+            `;
+            
+            // Update episode count in play button
+            playBtn.innerHTML = `<i class="fas fa-play"></i> Tonton Episode 1 (dari ${totalEpisodes})`;
+            playBtn.disabled = false;
+            trailerBtn.disabled = false;
+            
+            // Update modal actions
+            playBtn.onclick = () => {
+                if (currentEpisodes.length > 0 && currentEpisodes[0].vid) {
+                    playVideoStream(currentEpisodes[0].vid, {
+                        title: `Episode 1 - ${videoData.series_title}`,
+                        description: currentEpisodes[0].title || videoData.series_intro,
+                        episodeNumber: 1,
+                        seriesId: videoData.series_id_str
+                    });
+                    closeDramaModal();
+                } else {
+                    showNotification('Episode tidak tersedia untuk streaming.', 'warning');
+                }
+            };
+            
+            trailerBtn.onclick = () => {
+                showCustomModal('Trailer', `
+                    <div style="text-align: center;">
+                        <h3 style="margin-bottom: 20px; color: var(--primary-color);">
+                            <i class="fas fa-film"></i> Trailer ${videoData.series_title}
+                        </h3>
+                        <div style="background-color: #000; border-radius: 10px; padding: 20px; margin-bottom: 20px; min-height: 200px; display: flex; align-items: center; justify-content: center;">
+                            <div>
+                                <i class="fas fa-video" style="color: var(--primary-color); font-size: 60px; margin-bottom: 20px;"></i>
+                                <p style="color: var(--text-secondary);">Trailer akan dimuat di sini</p>
+                            </div>
+                        </div>
+                        <p style="color: var(--text-secondary); margin-bottom: 30px;">
+                            Fitur trailer dalam pengembangan.
+                        </p>
+                        <button onclick="closeCustomModal()" class="watch-btn" style="padding: 12px 30px;">
+                            <i class="fas fa-times"></i> Tutup
+                        </button>
+                    </div>
+                `, false);
+            };
+        }
+
+        // Display basic drama info (fallback)
+        function displayBasicDramaInfo(drama) {
+            const detailsList = document.getElementById('modalDetails');
+            const categories = drama.stat_infos ? drama.stat_infos.join(', ') : 'Drama';
+            const episodeCount = drama.serial_count || '0';
+            const author = drama.author || 'Tidak diketahui';
+            const status = drama.show_creation_status || 'Selesai';
+            const source = drama.source || 'Tidak diketahui';
+            const createTime = drama.create_time ? new Date(drama.create_time).toLocaleDateString('id-ID') : 'Tidak diketahui';
+            
+            detailsList.innerHTML = `
+                <li><i class="fas fa-user-edit"></i> <strong>Penulis:</strong> ${author}</li>
+                <li><i class="fas fa-list-ol"></i> <strong>Episode:</strong> ${episodeCount}</li>
+                <li><i class="fas fa-check-circle"></i> <strong>Status:</strong> ${status}</li>
+                <li><i class="fas fa-tags"></i> <strong>Kategori:</strong> ${categories}</li>
+                <li><i class="fas fa-calendar-alt"></i> <strong>Rilis:</strong> ${createTime}</li>
+                <li><i class="fas fa-database"></i> <strong>Sumber:</strong> ${source}</li>
+                <li><i class="fas fa-user-shield"></i> <strong>Rating Usia:</strong> ${drama.age_gate || '18'}+</li>
+            `;
+            
+            playBtn.innerHTML = `<i class="fas fa-play"></i> Tonton Sekarang`;
+            playBtn.disabled = false;
+            trailerBtn.disabled = false;
+            
+            playBtn.onclick = () => {
+                showCustomModal('Streaming', `
+                    <div style="text-align: center;">
+                        <h3 style="margin-bottom: 20px; color: var(--primary-color);">
+                            <i class="fas fa-play-circle"></i> Streaming Drama
+                        </h3>
+                        <p style="margin-bottom: 20px;">
+                            Episode 1 dari <strong>${drama.book_name}</strong> akan segera dimulai...
+                        </p>
+                        <div style="background-color: var(--light-bg); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                            <p style="color: var(--text-secondary); font-style: italic;">
+                                "Player video akan dimuat di sini"
+                            </p>
+                            <div class="loading" style="margin: 20px 0;">
+                                <i class="fas fa-spinner fa-spin" style="color: var(--primary-color); font-size: 30px;"></i>
+                            </div>
+                        </div>
+                        <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 30px;">
+                            <i class="fas fa-info-circle"></i> Untuk streaming langsung, pastikan video ID tersedia.
+                        </p>
+                        <button onclick="testStreamAPI()" class="trailer-btn" style="margin-right: 10px;">
+                            <i class="fas fa-video"></i> Test Stream API
+                        </button>
+                        <button onclick="closeCustomModal()" class="watch-btn">
+                            <i class="fas fa-times"></i> Tutup
+                        </button>
+                    </div>
+                `, false);
+            };
+            
+            trailerBtn.onclick = () => {
+                showCustomModal('Trailer', `
+                    <div style="text-align: center;">
+                        <h3 style="margin-bottom: 20px; color: var(--primary-color);">
+                            <i class="fas fa-film"></i> Trailer ${drama.book_name}
+                        </h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 30px;">
+                            Trailer untuk drama ini sedang tidak tersedia.
+                        </p>
+                        <button onclick="closeCustomModal()" class="watch-btn" style="padding: 12px 30px;">
+                            <i class="fas fa-times"></i> Tutup
+                        </button>
+                    </div>
+                `, false);
+            };
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'loading';
+            errorDiv.innerHTML = `
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>${message}</p>
+            `;
+            
+            trendingGrid.innerHTML = '';
+            trendingGrid.appendChild(errorDiv.cloneNode(true));
+            
+            latestGrid.innerHTML = '';
+            latestGrid.appendChild(errorDiv.cloneNode(true));
+            
+            popularGrid.innerHTML = '';
+            popularGrid.appendChild(errorDiv.cloneNode(true));
+        }
+
+        // Show modal error
+        function showModalError(message) {
+            showCustomModal('Terjadi Kesalahan', `
+                <div style="text-align: center;">
+                    <div style="margin-bottom: 20px;">
+                        <i class="fas fa-exclamation-triangle" style="color: #ff6b00; font-size: 50px;"></i>
+                    </div>
+                    <p style="margin-bottom: 20px; font-size: 18px;">${message}</p>
+                    <button onclick="closeCustomModal()" class="watch-btn" style="padding: 12px 30px;">
+                        <i class="fas fa-times"></i> Tutup
+                    </button>
+                </div>
+            `, true);
+        }
+
+        // Show loading modal
+        function showLoadingModal() {
+            document.getElementById('loadingModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Hide loading modal
+        function hideLoadingModal() {
+            document.getElementById('loadingModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Show custom modal
+        function showCustomModal(title, content, showClose = true) {
+            const modal = document.getElementById('customModal');
+            document.getElementById('customModalTitle').textContent = title;
+            document.getElementById('customModalContent').innerHTML = content;
+            
+            const closeBtn = modal.querySelector('.close-modal');
+            closeBtn.style.display = showClose ? 'block' : 'none';
+            
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close custom modal
+        function closeCustomModal() {
+            document.getElementById('customModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close drama modal
+        function closeDramaModal() {
+            dramaModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            currentDrama = null;
+            currentDramaDetail = null;
+            currentEpisodes = [];
+            
+            // Reset buttons
+            playBtn.innerHTML = `<i class="fas fa-play"></i> Tonton Sekarang`;
+            playBtn.disabled = false;
+            trailerBtn.disabled = false;
+        }
+
+        // Filter dramas by category
+        function filterDramas(category) {
+            if (category === 'all') {
+                filteredDramas = [...latestDramas];
+            } else if (category === 'hot') {
+                filteredDramas = latestDramas.filter(drama => drama.is_hot === "1");
+            } else {
+                filteredDramas = latestDramas.filter(drama => {
+                    const dramaCategory = getDramaCategory(drama);
+                    return dramaCategory === category;
+                });
+            }
+            
+            displayLatestDramas();
+        }
+
+        // Scroll to section
+        function scrollToSection(sectionId) {
+            // Reset search results section
+            searchResultsSection.classList.remove('active');
+            
+            // Show all sections
+            document.querySelectorAll('.section-title').forEach(title => {
+                title.style.display = 'block';
+            });
+            
+            document.querySelectorAll('.drama-grid').forEach(grid => {
+                grid.style.display = 'grid';
+            });
+            
+            document.querySelector('.filter-container').style.display = 'flex';
+            
+            const section = document.getElementById(sectionId);
+            if (section) {
+                window.scrollTo({
+                    top: section.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+                
+                // Update active nav link
+                document.querySelectorAll('nav a').forEach(link => {
+                    link.classList.remove('active');
+                });
+                
+                const activeLink = document.querySelector(`nav a[data-section="${sectionId}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
+            }
+        }
+
+        // Close search results when clicking outside
+        function closeSearchResults(e) {
+            if (!searchResults.contains(e.target) && !searchInput.contains(e.target) && !searchBtn.contains(e.target)) {
+                searchResults.classList.remove('active');
+            }
+        }
+
+        // VIDEO PLAYER FUNCTIONS
+        // Initialize video player
+        function initializeVideoPlayer() {
+            if (playerInitialized) return;
+            
+            playerInitialized = true;
+            console.log('Video player initialized');
+        }
+
+        // Play video stream
+        async function playVideoStream(videoId, episodeInfo = {}) {
+            try {
+                initializeVideoPlayer();
+                currentVideoId = videoId;
+                
+                // Show player
+                const playerModal = document.getElementById('videoPlayerModal');
+                playerModal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                
+                // Update episode info
+                if (episodeInfo.title) {
+                    document.getElementById('playerTitle').textContent = episodeInfo.title;
+                    document.getElementById('videoEpisodeTitle').textContent = episodeInfo.title;
+                }
+                
+                if (episodeInfo.description) {
+                    document.getElementById('videoDescription').textContent = episodeInfo.description;
+                }
+                
+                if (episodeInfo.episodeNumber) {
+                    document.getElementById('playerTitle').textContent = `Episode ${episodeInfo.episodeNumber}`;
+                }
+                
+                // Load video stream
+                showPlayerLoading('Loading video stream...');
+                await loadVideoStream(videoId, currentQuality);
+                
+                // Load available qualities
+                await loadQualityOptions(videoId);
+                
+                // Load subtitles
+                await loadSubtitles(videoId);
+                
+                // Load episode list if available
+                if (episodeInfo.seriesId) {
+                    await loadEpisodeList(episodeInfo.seriesId, episodeInfo.episodeNumber);
+                }
+                
+                showNotification('Video stream loaded successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error playing video:', error);
+                showPlayerError('Failed to load video stream');
+            }
+        }
+
+        // Load video stream
+        async function loadVideoStream(videoId, quality = 'auto') {
+            try {
+                showPlayerLoading('Loading stream...');
+                
+                const response = await fetch(`${API_URL_STREAM}/${videoId}`);
+                const data = await response.json();
+                
+                if (data.code === 0 && data.data && data.data.main_url) {
+                    currentStreamData = data.data;
+                    
+                    // Get video URL
+                    const videoUrl = data.data.main_url;
+                    
+                    // Load video into player
+                    const videoElement = document.getElementById('mainVideoPlayer');
+                    
+                    if (typeof videojs !== 'undefined') {
+                        if (!videoPlayer) {
+                            videoPlayer = videojs('mainVideoPlayer', {
+                                controls: true,
+                                autoplay: true,
+                                preload: 'auto',
+                                responsive: true,
+                                fluid: true
+                            });
+                        }
+                        
+                        videoPlayer.src({
+                            src: videoUrl,
+                            type: 'video/mp4'
+                        });
+                        
+                        videoPlayer.play();
+                    } else {
+                        videoElement.src = videoUrl;
+                        videoElement.load();
+                        videoElement.play().catch(e => {
+                            console.log('Autoplay prevented:', e);
+                        });
+                    }
+                    
+                    // Update UI with stream info
+                    updateStreamInfoUI(data.data);
+                    hidePlayerLoading();
+                    
+                    return true;
+                } else {
+                    throw new Error(data.message || 'Failed to load stream');
+                }
+            } catch (error) {
+                console.error('Error loading video stream:', error);
+                hidePlayerLoading();
+                
+                // Show simulation mode
+                showCustomModal('Stream Simulation', `
+                    <div style="text-align: center;">
+                        <h3 style="margin-bottom: 20px; color: var(--primary-color);">
+                            <i class="fas fa-video"></i> Stream Demo Mode
+                        </h3>
+                        <p style="margin-bottom: 20px;">
+                            Video ID: <strong>${videoId}</strong>
+                        </p>
+                        <div style="background-color: #000; border-radius: 10px; padding: 30px; margin-bottom: 20px;">
+                            <i class="fas fa-play-circle" style="color: white; font-size: 60px; margin-bottom: 20px;"></i>
+                            <p style="color: white;">Video Player Simulation</p>
+                            <p style="color: var(--text-secondary); font-size: 14px; margin-top: 10px;">
+                                Stream URL would be loaded here
+                            </p>
+                        </div>
+                        <p style="color: var(--text-secondary); margin-bottom: 30px;">
+                            In production, the actual video stream would play here.
+                        </p>
+                        <button onclick="closeCustomModal()" class="watch-btn" style="padding: 12px 30px;">
+                            <i class="fas fa-times"></i> Close
+                        </button>
+                    </div>
+                `, true);
+                
+                return false;
+            }
+        }
+
+        // Load quality options
+        async function loadQualityOptions(videoId) {
+            try {
+                const response = await fetch(`${API_URL_STREAM_QUALITY}/${videoId}?quality=auto`);
+                const data = await response.json();
+                
+                if (data.code === 0 && data.data && data.data.quality_options) {
+                    const qualityOptions = document.getElementById('qualityOptions');
+                    qualityOptions.innerHTML = '';
+                    
+                    // Add auto option
+                    const autoOption = document.createElement('div');
+                    autoOption.className = `quality-option ${currentQuality === 'auto' ? 'active' : ''}`;
+                    autoOption.setAttribute('data-quality', 'auto');
+                    autoOption.innerHTML = `
+                        <i class="fas fa-magic"></i>
+                        <span>Auto (Recommended)</span>
+                        <span class="quality-desc">Best for your connection</span>
+                    `;
+                    autoOption.addEventListener('click', () => {
+                        document.querySelectorAll('.quality-option').forEach(opt => opt.classList.remove('active'));
+                        autoOption.classList.add('active');
+                    });
+                    qualityOptions.appendChild(autoOption);
+                    
+                    // Add other quality options
+                    Object.keys(data.data.quality_options).forEach(qualityKey => {
+                        const quality = data.data.quality_options[qualityKey];
+                        
+                        const option = document.createElement('div');
+                        option.className = `quality-option ${currentQuality === quality.definition ? 'active' : ''}`;
+                        option.setAttribute('data-quality', quality.definition);
+                        option.innerHTML = `
+                            <i class="fas fa-hd"></i>
+                            <span>${quality.definition.toUpperCase()}</span>
+                            <span class="quality-desc">${quality.vwidth}x${quality.vheight}</span>
+                        `;
+                        option.addEventListener('click', () => {
+                            document.querySelectorAll('.quality-option').forEach(opt => opt.classList.remove('active'));
+                            option.classList.add('active');
+                        });
+                        qualityOptions.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading quality options:', error);
+            }
+        }
+
+        // Load subtitles
+        async function loadSubtitles(videoId) {
+            try {
+                const response = await fetch(`${API_URL_SUBTITLES}/${videoId}`);
+                const data = await response.json();
+                
+                if (data.code === 0 && data.data) {
+                    const subtitleOptions = document.getElementById('subtitleOptions');
+                    
+                    if (data.data.available && data.data.subtitles && data.data.subtitles.length > 0) {
+                        subtitleOptions.innerHTML = '';
+                        
+                        // Add "None" option
+                        const noneOption = document.createElement('div');
+                        noneOption.className = 'subtitle-option active';
+                        noneOption.setAttribute('data-subtitle', 'none');
+                        noneOption.innerHTML = `
+                            <i class="fas fa-ban"></i>
+                            <span>None</span>
+                        `;
+                        noneOption.addEventListener('click', () => {
+                            document.querySelectorAll('.subtitle-option').forEach(opt => opt.classList.remove('active'));
+                            noneOption.classList.add('active');
+                        });
+                        subtitleOptions.appendChild(noneOption);
+                        
+                        // Add subtitle options
+                        data.data.subtitles.forEach(subtitle => {
+                            const option = document.createElement('div');
+                            option.className = 'subtitle-option';
+                            option.setAttribute('data-subtitle', subtitle.language_code);
+                            option.innerHTML = `
+                                <i class="fas fa-flag"></i>
+                                <span>${subtitle.language}</span>
+                            `;
+                            option.addEventListener('click', () => {
+                                document.querySelectorAll('.subtitle-option').forEach(opt => opt.classList.remove('active'));
+                                option.classList.add('active');
+                            });
+                            subtitleOptions.appendChild(option);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading subtitles:', error);
+            }
+        }
+
+        // Load episode list
+        async function loadEpisodeList(seriesId, currentEpisodeNumber) {
+            try {
+                // Fetch episodes from the detail endpoint
+                const response = await fetch(`${API_URL_DETAIL}/${seriesId}`);
+                const data = await response.json();
+                
+                if (data.code === 0 && data.data && data.data.video_data && data.data.video_data.video_list) {
+                    const episodes = data.data.video_data.video_list;
+                    const episodeList = document.getElementById('episodeList');
+                    episodeList.innerHTML = '';
+                    
+                    episodes.forEach(episode => {
+                        const episodeItem = document.createElement('div');
+                        episodeItem.className = `episode-item ${episode.vid_index == currentEpisodeNumber ? 'active' : ''}`;
+                        episodeItem.setAttribute('data-vid', episode.vid);
+                        episodeItem.setAttribute('data-episode', episode.vid_index);
+                        episodeItem.innerHTML = `
+                            <div class="episode-thumb">
+                                <img src="${episode.cover || episode.episode_cover}" 
+                                     alt="Episode ${episode.vid_index}"
+                                     onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80';">
+                                <div class="episode-number">${episode.vid_index}</div>
+                            </div>
+                            <div class="episode-info">
+                                <div class="episode-title">Episode ${episode.vid_index}</div>
+                                <div class="episode-meta">
+                                    <span>${formatDuration(episode.duration || 0)}</span>
+                                    <span>${episode.digged_count ? episode.digged_count.toLocaleString() : '0'} ❤️</span>
+                                </div>
+                            </div>
+                        `;
+                        
+                        episodeItem.addEventListener('click', () => {
+                            playEpisodeFromList(episode.vid, episode.vid_index, episode);
+                        });
+                        
+                        episodeList.appendChild(episodeItem);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading episode list:', error);
+            }
+        }
+
+        // Play episode from list
+        function playEpisodeFromList(videoId, episodeNumber, episodeInfo) {
+            playVideoStream(videoId, {
+                title: `Episode ${episodeNumber}`,
+                description: episodeInfo.title || 'No description available',
+                episodeNumber: episodeNumber,
+                seriesId: episodeInfo.series_id
+            });
+        }
+
+        // Update stream info UI
+        function updateStreamInfoUI(streamData) {
+            // Update resolution
+            if (streamData.video_width && streamData.video_height) {
+                document.getElementById('resolutionInfo').textContent = 
+                    `${streamData.video_width}x${streamData.video_height}`;
+            }
+            
+            // Update quality badge
+            const qualityText = document.getElementById('currentQualityText');
+            qualityText.textContent = currentQuality === 'auto' ? 'Auto' : currentQuality.toUpperCase();
+            
+            // Update quality badge class
+            const qualityBadge = document.getElementById('currentQualityBadge');
+            qualityBadge.className = `quality-badge ${currentQuality === 'auto' ? 'auto' : currentQuality}`;
+        }
+
+        // Show player loading
+        function showPlayerLoading(message = 'Loading...') {
+            const loadingEl = document.getElementById('videoLoading');
+            if (loadingEl) {
+                loadingEl.style.display = 'flex';
+                loadingEl.querySelector('p').textContent = message;
+            }
+        }
+
+        function hidePlayerLoading() {
+            const loadingEl = document.getElementById('videoLoading');
+            if (loadingEl) {
+                loadingEl.style.display = 'none';
+            }
+        }
+
+        // Show player error
+        function showPlayerError(message) {
+            hidePlayerLoading();
+            showNotification(message, 'error');
+        }
+
+        // Close video player
+        function closeVideoPlayer() {
+            const playerModal = document.getElementById('videoPlayerModal');
+            if (playerModal) {
+                playerModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+                
+                // Pause video
+                if (videoPlayer) {
+                    videoPlayer.pause();
+                } else {
+                    const videoElement = document.getElementById('mainVideoPlayer');
+                    if (videoElement) videoElement.pause();
+                }
+            }
+        }
+
+        // Test Stream API
+        async function testStreamAPI() {
+            try {
+                showCustomModal('Testing Stream API', `
+                    <div style="text-align: center;">
+                        <div class="loading" style="margin: 20px 0;">
+                            <i class="fas fa-spinner fa-spin" style="color: var(--primary-color); font-size: 30px;"></i>
+                        </div>
+                        <p>Menguji koneksi ke API stream...</p>
+                    </div>
+                `, false);
+                
+                // Test with a known video ID
+                const testVideoId = '7583564321033030661';
+                const response = await fetch(`${API_URL_VALIDATE}/${testVideoId}`);
+                const data = await response.json();
+                
+                if (data.code === 0 && data.data.valid) {
+                    showCustomModal('API Stream Berfungsi', `
+                        <div style="text-align: center;">
+                            <div style="margin-bottom: 20px;">
+                                <i class="fas fa-check-circle" style="color: #4CAF50; font-size: 50px;"></i>
+                            </div>
+                            <p style="margin-bottom: 10px; font-size: 18px;">
+                                API Stream berfungsi dengan baik!
+                            </p>
+                            <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                                Video ID: ${testVideoId}<br>
+                                Status: Valid
+                            </p>
+                            <div style="background-color: var(--light-bg); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                                <p style="font-size: 14px; color: var(--text-secondary);">
+                                    <i class="fas fa-lightbulb"></i> Coba gunakan video ID dari daftar episode untuk streaming langsung.
+                                </p>
+                            </div>
+                            <button onclick="closeCustomModal()" class="watch-btn">
+                                <i class="fas fa-times"></i> Tutup
+                            </button>
+                        </div>
+                    `, true);
+                } else {
+                    throw new Error(data.message || 'API validation failed');
+                }
+            } catch (error) {
+                showCustomModal('API Stream Error', `
+                    <div style="text-align: center;">
+                        <div style="margin-bottom: 20px;">
+                            <i class="fas fa-exclamation-triangle" style="color: #ff6b00; font-size: 50px;"></i>
+                        </div>
+                        <p style="margin-bottom: 10px; font-size: 18px;">
+                            Gagal mengakses API Stream
+                        </p>
+                        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                            Error: ${error.message}
+                        </p>
+                        <div style="background-color: var(--light-bg); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                            <p style="font-size: 14px; color: var(--text-secondary;">
+                                <i class="fas fa-lightbulb"></i> Pastikan endpoint API stream tersedia dan video ID valid.
+                            </p>
+                        </div>
+                        <button onclick="closeCustomModal()" class="watch-btn">
+                            <i class="fas fa-times"></i> Tutup
+                        </button>
+                    </div>
+                `, true);
+            }
+        }
+
+        // Setup video player controls
+        function setupVideoPlayerControls() {
+            // Close player
+            document.getElementById('closePlayer').addEventListener('click', closeVideoPlayer);
+            
+            // Close modal when clicking outside
+            document.getElementById('videoPlayerModal').addEventListener('click', (e) => {
+                if (e.target.id === 'videoPlayerModal') {
+                    closeVideoPlayer();
+                }
+            });
+            
+            // Quality modal
+            document.getElementById('qualityBtn').addEventListener('click', () => {
+                document.getElementById('qualityModal').style.display = 'block';
+            });
+            
+            document.getElementById('applyQuality').addEventListener('click', () => {
+                const selected = document.querySelector('.quality-option.active');
+                if (selected) {
+                    const quality = selected.getAttribute('data-quality');
+                    currentQuality = quality;
+                    if (currentVideoId) {
+                        loadVideoStream(currentVideoId, quality);
+                    }
+                }
+                document.getElementById('qualityModal').style.display = 'none';
+            });
+            
+            document.getElementById('cancelQuality').addEventListener('click', () => {
+                document.getElementById('qualityModal').style.display = 'none';
+            });
+            
+            // Subtitle modal
+            document.getElementById('subtitleBtn').addEventListener('click', () => {
+                document.getElementById('subtitleModal').style.display = 'block';
+            });
+            
+            document.getElementById('applySubtitle').addEventListener('click', () => {
+                const selected = document.querySelector('.subtitle-option.active');
+                if (selected) {
+                    const subtitle = selected.getAttribute('data-subtitle');
+                    // In real implementation, you would load the subtitle track
+                    console.log('Subtitle changed to:', subtitle);
+                }
+                document.getElementById('subtitleModal').style.display = 'none';
+            });
+            
+            document.getElementById('cancelSubtitle').addEventListener('click', () => {
+                document.getElementById('subtitleModal').style.display = 'none';
+            });
+            
+            // Fullscreen
+            document.getElementById('fullscreenBtn').addEventListener('click', () => {
+                const modal = document.querySelector('.video-player-modal .modal-content');
+                if (!document.fullscreenElement) {
+                    if (modal.requestFullscreen) {
+                        modal.requestFullscreen();
+                    }
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    }
+                }
+            });
+            
+            // Episode navigation
+            document.getElementById('episodeListToggle').addEventListener('click', () => {
+                document.getElementById('episodeSidebar').classList.toggle('active');
+            });
+            
+            document.getElementById('closeSidebar').addEventListener('click', () => {
+                document.getElementById('episodeSidebar').classList.remove('active');
+            });
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize
+            fetchAllData();
+            setupVideoPlayerControls();
+            
+            // Header scroll effect
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    mainHeader.classList.add('scrolled');
+                } else {
+                    mainHeader.classList.remove('scrolled');
+                }
+            });
+            
+            // Close search results when clicking outside
+            document.addEventListener('click', closeSearchResults);
+            
+            // Close modals with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeDramaModal();
+                    closeCustomModal();
+                    closeVideoPlayer();
+                    hideLoadingModal();
+                }
+            });
+        });
+
+        exploreBtn.addEventListener('click', () => scrollToSection('trending'));
+
+        // Search functionality
+        searchBtn.addEventListener('click', () => {
+            const query = searchInput.value.trim();
+            if (query) {
+                searchDramas(query);
+            }
+        });
+
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.trim();
+            
+            // Clear previous timeout
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+            
+            // Hide search results if query is empty
+            if (!query) {
+                searchResults.classList.remove('active');
+                return;
+            }
+            
+            // Debounce search
+            searchTimeout = setTimeout(() => {
+                if (query.length >= 2) {
+                    searchDramas(query);
+                }
+            }, 500);
+        });
+
+        searchInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim();
+                if (query) {
+                    searchDramas(query);
+                }
+            }
+        });
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const filter = btn.getAttribute('data-filter');
+                filterDramas(filter);
+            });
+        });
+
+        closeModal.addEventListener('click', closeDramaModal);
+        dramaModal.addEventListener('click', (e) => {
+            if (e.target === dramaModal) {
+                closeDramaModal();
+            }
+        });
+
+        // Mobile menu toggle
+        mobileMenuBtn.addEventListener('click', () => {
+            mainNav.classList.toggle('active');
+            mobileMenuBtn.innerHTML = mainNav.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+
+        // Navigation links
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const sectionId = this.getAttribute('data-section');
+                if (sectionId) {
+                    scrollToSection(sectionId);
+                    
+                    // Close mobile menu if open
+                    if (mainNav.classList.contains('active')) {
+                        mainNav.classList.remove('active');
+                        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                    }
+                }
+            });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!mainNav.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                mainNav.classList.remove('active');
+                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+        });
+
+        // Test player button
+        testPlayerBtn.addEventListener('click', () => {
+            const testVideoId = '7583564321033030661';
+            playVideoStream(testVideoId, {
+                title: 'Test Video Stream',
+                description: 'This is a test video stream demonstration',
+                episodeNumber: 1,
+                seriesId: 'test-series'
+            });
+        });
+
+        // Make functions available globally
+        window.closeCustomModal = closeCustomModal;
+        window.testStreamAPI = testStreamAPI;
+        window.playEpisodeFromList = playEpisodeFromList;
+        window.closeVideoPlayer = closeVideoPlayer;
+    </script>
+</body>
+</html>
